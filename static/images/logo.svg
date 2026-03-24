@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#001a8c"/>
+  <text x="20" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">LUCION</text>
+  <circle cx="160" cy="30" r="15" fill="#c9a96e"/>
+  <text x="100" y="55" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">山东金融资产</text>
+</svg>

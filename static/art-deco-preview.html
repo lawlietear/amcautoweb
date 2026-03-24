@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Deco 风格预览 - 山东金融资产智能文书系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ========== Art Deco 配色 - 奶油色版本 ========== */
+        :root {
+            --deco-gold: #C9A96E;
+            --deco-gold-light: #E8D5A3;
+            --deco-gold-dark: #8B7355;
+            --deco-cream: #F5F0E8;
+            --deco-cream-dark: #E8E0D0;
+            --deco-black: #1A1A1A;
+            --deco-charcoal: #2D2D2D;
+            --deco-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', 'Playfair Display', serif;
+            background: var(--deco-cream);
+            min-height: 100vh;
+            color: var(--deco-black);
+        }
+
+        /* ========== 几何装饰背景 ========== */
+        .deco-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* 太阳光芒效果 - 金色版本 */
+        .sunburst {
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200%;
+            height: 150%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(201, 169, 110, 0.08) 5deg,
+                transparent 10deg,
+                transparent 20deg,
+                rgba(201, 169, 110, 0.08) 25deg,
+                transparent 30deg,
+                transparent 40deg,
+                rgba(201, 169, 110, 0.08) 45deg,
+                transparent 50deg,
+                transparent 60deg,
+                rgba(201, 169, 110, 0.08) 65deg,
+                transparent 70deg,
+                transparent 80deg,
+                rgba(201, 169, 110, 0.08) 85deg,
+                transparent 90deg
+            );
+            animation: sunburst-rotate 60s linear infinite;
+        }
+
+        @keyframes sunburst-rotate {
+            from { transform: translateX(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        /* 几何边框装饰 - 浅色背景 */
+        .geo-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, transparent 48%, rgba(201, 169, 110, 0.15) 49%, rgba(201, 169, 110, 0.15) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(201, 169, 110, 0.15) 49%, rgba(201, 169, 110, 0.15) 51%, transparent 52%);
+            background-size: 80px 80px;
+            opacity: 0.6;
+        }
+
+        /* ========== 主容器 ========== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ========== Art Deco 标题区 ========== */
+        .hero-section {
+            text-align: center;
+            padding: 80px 40px;
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        /* 装饰边框 - 上层 */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 100%;
+            border: 2px solid var(--deco-gold);
+            border-bottom: none;
+            clip-path: polygon(
+                0 0, 100% 0, 100% 85%, 85% 100%, 15% 100%, 0 85%
+            );
+            pointer-events: none;
+        }
+
+        /* 装饰边框 - 内层 */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(80% - 20px);
+            height: calc(100% - 20px);
+            border: 1px solid var(--deco-gold-dark);
+            border-bottom: none;
+            clip-path: polygon(
+                0 0, 100% 0, 100% 85%, 85% 100%, 15% 100%, 0 85%
+            );
+            pointer-events: none;
+        }
+
+        /* Logo区域 */
+        .logo-area {
+            display: inline-block;
+            padding: 20px 60px;
+            border: 3px double var(--deco-gold);
+            margin-bottom: 40px;
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 240, 232, 0.9));
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.2);
+        }
+
+        .logo-area::before,
+        .logo-area::after {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--deco-gold);
+            font-size: 20px;
+        }
+
+        .logo-area::before { left: 20px; }
+        .logo-area::after { right: 20px; }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--deco-gold);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        .logo-subtitle {
+            font-size: 24px;
+            color: var(--deco-gold-light);
+            letter-spacing: 4px;
+            margin-top: 10px;
+        }
+
+        /* 主标题 */
+        .main-title {
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--deco-black);
+            letter-spacing: 6px;
+            margin: 30px 0;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: var(--deco-charcoal);
+            letter-spacing: 3px;
+        }
+
+        /* 装饰分隔线 */
+        .deco-divider {
+            width: 60%;
+            height: 4px;
+            margin: 40px auto;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--deco-gold) 20%,
+                var(--deco-gold-light) 50%,
+                var(--deco-gold) 80%,
+                transparent 100%
+            );
+            position: relative;
+        }
+
+        .deco-divider::before,
+        .deco-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--deco-gold);
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .deco-divider::before { left: 20%; }
+        .deco-divider::after { right: 20%; }
+
+        /* ========== 部门卡片 - Art Deco 风格 ========== */
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .dept-card {
+            position: relative;
+            padding: 50px 40px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.9) 0%, 
+                rgba(245, 240, 232, 0.9) 50%,
+                rgba(255, 255, 255, 0.9) 100%
+            );
+            border: 2px solid var(--deco-gold);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.15);
+        }
+
+        /* Art Deco 几何装饰角 */
+        .dept-card::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            border-top: 3px solid var(--deco-gold);
+            border-left: 3px solid var(--deco-gold);
+        }
+
+        .dept-card::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-bottom: 3px solid var(--deco-gold);
+            border-right: 3px solid var(--deco-gold);
+        }
+
+        .dept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(201, 169, 110, 0.3);
+            border-color: var(--deco-gold-light);
+        }
+
+        .dept-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--deco-gold);
+        }
+
+        .dept-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--deco-black);
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+        }
+
+        .dept-desc {
+            font-size: 16px;
+            color: var(--deco-charcoal);
+            letter-spacing: 2px;
+        }
+
+        /* ========== 表格预览区 ========== */
+        .preview-section {
+            margin-top: 80px;
+            padding: 40px;
+            border: 1px solid var(--deco-gold);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.1);
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--deco-gold);
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* 模拟表格 */
+        .mock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .mock-table th {
+            background: linear-gradient(180deg, var(--deco-gold-dark), var(--deco-gold));
+            color: var(--deco-navy);
+            padding: 15px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border: 1px solid var(--deco-gold);
+        }
+
+        .mock-table td {
+            padding: 12px 15px;
+            border: 1px solid var(--deco-gold-dark);
+            color: var(--deco-black);
+            background: rgba(201, 169, 110, 0.05);
+        }
+
+        .mock-table tr:hover td {
+            background: rgba(201, 169, 110, 0.15);
+        }
+
+        /* ========== 按钮样式 ========== */
+        .deco-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid var(--deco-gold);
+            color: var(--deco-gold);
+            font-family: inherit;
+            font-size: 16px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .deco-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(201, 169, 110, 0.4),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .deco-btn:hover::before {
+            left: 100%;
+        }
+
+        .deco-btn:hover {
+            background: var(--deco-gold);
+            color: var(--deco-navy);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 768px) {
+            .dept-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 36px;
+            }
+            
+            .logo-text {
+                font-size: 32px;
+            }
+        }
+
+        /* ========== 说明文字 ========== */
+        .note {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border: 1px dashed var(--deco-gold);
+            color: var(--deco-charcoal);
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="deco-bg">
+        <div class="sunburst"></div>
+        <div class="geo-pattern"></div>
+    </div>
+
+    <div class="container">
+        <!-- 标题区 -->
+        <section class="hero-section">
+            <div class="logo-area">
+                <div class="logo-text">LUCION</div>
+                <div class="logo-subtitle">山东金融资产</div>
+            </div>
+            
+            <h1 class="main-title">智能文书系统</h1>
+            <div class="deco-divider"></div>
+            <p class="subtitle">选择部门进入相应的文书生成系统</p>
+        </section>
+
+        <!-- 部门卡片 -->
+        <div class="dept-grid">
+            <div class="dept-card">
+                <div class="dept-icon">⚖️</div>
+                <h2 class="dept-title">风险合规部</h2>
+                <p class="dept-desc">批复文件生成</p>
+            </div>
+            
+            <div class="dept-card">
+                <div class="dept-icon">💼</div>
+                <h2 class="dept-title">业务部</h2>
+                <p class="dept-desc">处置合同生成</p>
+            </div>
+        </div>
+
+        <!-- 表格预览 -->
+        <section class="preview-section">
+            <h3 class="section-title">数据录入界面预览</h3>
+            <table class="mock-table">
+                <thead>
+                    <tr>
+                        <th>基准日</th>
+                        <th>债权本金金额</th>
+                        <th>债权利息金额</th>
+                        <th>债权总额</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025年12月31日</td>
+                        <td>10,000,000.00</td>
+                        <td>2,000,000.00</td>
+                        <td>12,100,000.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="deco-btn">加载示例</button>
+                <button class="deco-btn">生成文书</button>
+            </div>
+        </section>
+
+        <!-- 说明 -->
+        <div class="note">
+            <p>🎨 Art Deco 风格预览 | 配色：深蓝 + 香槟金 | 字体：Playfair Display + 思源宋体</p>
+            <p>特点：几何装饰、太阳光芒背景、双层边框、金色渐变</p>
+        </div>
+    </div>
+</body>
+</html>

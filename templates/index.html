@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>山东金融资产智能文书系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 首页专用 Art Deco 样式 */
+        .index-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--deco-cream);
+            position: relative;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        /* 背景装饰 */
+        .deco-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .sunburst {
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200%;
+            height: 150%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(201, 169, 110, 0.06) 5deg,
+                transparent 10deg,
+                transparent 20deg,
+                rgba(201, 169, 110, 0.06) 25deg,
+                transparent 30deg,
+                transparent 40deg,
+                rgba(201, 169, 110, 0.06) 45deg,
+                transparent 50deg,
+                transparent 60deg,
+                rgba(201, 169, 110, 0.06) 65deg,
+                transparent 70deg,
+                transparent 80deg,
+                rgba(201, 169, 110, 0.06) 85deg,
+                transparent 90deg
+            );
+            animation: sunburst-rotate 60s linear infinite;
+        }
+
+        @keyframes sunburst-rotate {
+            from { transform: translateX(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        .geo-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, transparent 48%, rgba(201, 169, 110, 0.06) 49%, rgba(201, 169, 110, 0.06) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(201, 169, 110, 0.06) 49%, rgba(201, 169, 110, 0.06) 51%, transparent 52%);
+            background-size: 80px 80px;
+            opacity: 0.4;
+        }
+
+        /* 左下角时间显示 */
+        .datetime-corner {
+            position: fixed;
+            bottom: 32px;
+            left: 32px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--deco-gold);
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.1);
+        }
+
+        /* 装饰角 */
+        .datetime-corner::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid var(--deco-gold);
+            border-left: 2px solid var(--deco-gold);
+        }
+
+        .datetime-corner::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 10px;
+            height: 10px;
+            border-bottom: 2px solid var(--deco-gold);
+            border-right: 2px solid var(--deco-gold);
+        }
+
+        .datetime-corner .date {
+            font-size: 13px;
+            color: var(--deco-gold-dark);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .datetime-corner .time {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--deco-black);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            line-height: 1;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1200px;
+            padding: 80px 40px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Art Deco 标题区 */
+        .hero-section {
+            text-align: center;
+            padding: 60px 40px 40px;
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        /* 装饰边框 - 上层 */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 100%;
+            border: 2px solid var(--deco-gold);
+            border-bottom: none;
+            clip-path: polygon(
+                0 0, 100% 0, 100% 85%, 85% 100%, 15% 100%, 0 85%
+            );
+            pointer-events: none;
+        }
+
+        /* 装饰边框 - 内层 */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(80% - 20px);
+            height: calc(100% - 20px);
+            border: 1px solid var(--deco-gold-dark);
+            border-bottom: none;
+            clip-path: polygon(
+                0 0, 100% 0, 100% 85%, 85% 100%, 15% 100%, 0 85%
+            );
+            pointer-events: none;
+        }
+
+        /* Logo区域 - LUCION */
+        .logo-area {
+            display: inline-block;
+            padding: 24px 60px;
+            border: 3px double var(--deco-gold);
+            margin-bottom: 40px;
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 240, 232, 0.9));
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.2);
+        }
+
+        .logo-area::before,
+        .logo-area::after {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--deco-gold);
+            font-size: 16px;
+        }
+
+        .logo-area::before { left: 24px; }
+        .logo-area::after { right: 24px; }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--deco-gold);
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            font-size: 24px;
+            color: var(--deco-gold-dark);
+            letter-spacing: 6px;
+            font-weight: 400;
+        }
+
+        /* 主标题 */
+        .main-title {
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--deco-black);
+            letter-spacing: 8px;
+            margin: 40px 0 20px;
+        }
+
+        /* 装饰分隔线 */
+        .deco-divider {
+            width: 60%;
+            height: 3px;
+            margin: 30px auto;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--deco-gold) 20%,
+                var(--deco-gold-light) 50%,
+                var(--deco-gold) 80%,
+                transparent 100%
+            );
+            position: relative;
+        }
+
+        .deco-divider::before,
+        .deco-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background: var(--deco-gold);
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .deco-divider::before { left: 20%; }
+        .deco-divider::after { right: 20%; }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--deco-charcoal);
+            letter-spacing: 3px;
+            margin-top: 20px;
+        }
+
+        /* 问候语 */
+        .greeting-section {
+            margin-bottom: 16px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--deco-gold-dark);
+            letter-spacing: 2px;
+        }
+
+        /* 部门卡片区域 */
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .dept-card {
+            position: relative;
+            padding: 50px 40px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.9) 0%, 
+                rgba(245, 240, 232, 0.9) 50%,
+                rgba(255, 255, 255, 0.9) 100%
+            );
+            border: 2px solid var(--deco-gold);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.1);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Art Deco 几何装饰角 */
+        .dept-card::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 30px;
+            height: 30px;
+            border-top: 3px solid var(--deco-gold);
+            border-left: 3px solid var(--deco-gold);
+        }
+
+        .dept-card::after {
+            content: '';
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 30px;
+            height: 30px;
+            border-bottom: 3px solid var(--deco-gold);
+            border-right: 3px solid var(--deco-gold);
+        }
+
+        .dept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(201, 169, 110, 0.25);
+            border-color: var(--deco-gold-light);
+        }
+
+        .dept-icon {
+            font-size: 48px;
+            margin-bottom: 24px;
+            display: block;
+            color: var(--deco-gold);
+        }
+
+        .dept-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--deco-black);
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+
+        .dept-desc {
+            font-size: 14px;
+            color: var(--deco-charcoal);
+            letter-spacing: 2px;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--deco-gold);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* 系统状态 */
+        .system-status {
+            position: fixed;
+            top: 20px;
+            right: 40px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .status-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--deco-gold);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: var(--deco-gold-dark);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* 页脚 */
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            padding-bottom: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            font-size: 14px;
+            color: var(--deco-gold-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            letter-spacing: 1px;
+        }
+
+        .footer-link:hover {
+            color: var(--deco-gold);
+        }
+
+        .footer-dot {
+            color: var(--deco-gold);
+            font-size: 12px;
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: var(--deco-gold-dark);
+            letter-spacing: 1px;
+        }
+
+        /* 审计日志浮动按钮 */
+        .audit-float-btn {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 56px;
+            height: 56px;
+            background: var(--deco-gold);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(201, 169, 110, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+            text-decoration: none;
+            border: 2px solid var(--deco-gold-light);
+        }
+
+        .audit-float-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 32px rgba(201, 169, 110, 0.5);
+            background: var(--deco-gold-dark);
+        }
+
+        .audit-float-btn svg {
+            stroke: white;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .datetime-corner {
+                bottom: 20px;
+                left: 20px;
+                padding: 12px 16px;
+            }
+
+            .datetime-corner .time {
+                font-size: 22px;
+            }
+
+            .datetime-corner .date {
+                font-size: 12px;
+            }
+
+            .system-status {
+                right: 20px;
+                top: 16px;
+            }
+
+            .status-number {
+                font-size: 20px;
+            }
+
+            .main-content {
+                padding: 60px 20px 100px;
+            }
+
+            .hero-section {
+                padding: 40px 20px 30px;
+            }
+
+            .hero-section::before,
+            .hero-section::after {
+                width: 95%;
+            }
+
+            .logo-area {
+                padding: 18px 40px;
+            }
+
+            .logo-area::before,
+            .logo-area::after {
+                display: none;
+            }
+
+            .logo-text {
+                font-size: 36px;
+                letter-spacing: 6px;
+            }
+
+            .logo-subtitle {
+                font-size: 18px;
+                letter-spacing: 3px;
+            }
+
+            .main-title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .dept-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .dept-card {
+                padding: 36px 24px;
+            }
+
+            .dept-title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body class="index-page">
+    <!-- 动态背景装饰 -->
+    <div class="deco-bg">
+        <div class="sunburst"></div>
+        <div class="geo-pattern"></div>
+    </div>
+
+    <!-- 左下角时间显示 -->
+    <div class="datetime-corner" id="datetime">
+        <span class="date">--</span>
+        <span class="time">--:--</span>
+    </div>
+
+    <!-- 系统状态 - 右上角 -->
+    <div class="system-status">
+        <div class="status-item">
+            <span class="status-number" id="today-count">0</span>
+            <span class="status-label">今日生成</span>
+        </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- Art Deco 标题区 -->
+        <section class="hero-section">
+            <!-- LUCION Logo 区域 -->
+            <div class="logo-area">
+                <div class="logo-text">LUCION</div>
+                <div class="logo-subtitle">山东金融资产</div>
+            </div>
+            
+            <!-- 问候语 -->
+            <div class="greeting-section">
+                <div class="greeting" id="greeting">欢迎使用</div>
+            </div>
+            
+            <!-- 主标题 -->
+            <h1 class="main-title">智能文书系统</h1>
+            
+            <!-- 装饰分隔线 -->
+            <div class="deco-divider"></div>
+            
+            <!-- 副标题 -->
+            <p class="subtitle">选择部门进入相应的文书生成系统</p>
+        </section>
+
+        <!-- 部门卡片 -->
+        <div class="dept-grid">
+            <a href="/business" class="dept-card">
+                <svg class="dept-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <div class="card-badge" id="badge-business" style="display:none;">常用</div>
+                <h2 class="dept-title">业务部</h2>
+                <p class="dept-desc">处置合同生成</p>
+            </a>
+            
+            <a href="/risk_compliance" class="dept-card">
+                <svg class="dept-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+                <div class="card-badge" id="badge-risk" style="display:none;">常用</div>
+                <h2 class="dept-title">风险合规部</h2>
+                <p class="dept-desc">批复文件生成</p>
+            </a>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#" class="footer-link" onclick="alert('模板下载功能开发中，敬请期待'); return false;">模板下载</a>
+                <span class="footer-dot">◆</span>
+                <a href="#" class="footer-link" onclick="alert('请联系技术部获取支持'); return false;">技术支持</a>
+            </div>
+            <p>山东省金融资产管理股份有限公司 · 内部系统</p>
+        </div>
+    </div>
+    
+    <!-- 审计日志浮动按钮 -->
+    <a href="/audit_log" class="audit-float-btn" title="审计日志">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+        </svg>
+    </a>
+    
+    <script>
+        // 更新日期时间
+        function updateDateTime() {
+            const now = new Date();
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            
+            const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 星期${weekdays[now.getDay()]}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            document.querySelector('.datetime-corner .date').textContent = dateStr;
+            document.querySelector('.datetime-corner .time').textContent = timeStr;
+            
+            // 问候语
+            const hour = now.getHours();
+            let greeting = '欢迎使用';
+            if (hour < 12) greeting = '早上好，开启高效的一天';
+            else if (hour < 14) greeting = '中午好，记得休息片刻';
+            else if (hour < 18) greeting = '下午好，继续加油';
+            else greeting = '晚上好，注意休息';
+            
+            document.getElementById('greeting').textContent = greeting;
+        }
+        
+        // 统计数据（从本地存储获取今日生成数量）
+        function updateStats() {
+            const today = new Date().toDateString();
+            const stored = localStorage.getItem('amc_stats');
+            let stats = { today: 0, date: today };
+            
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (parsed.date === today) {
+                    stats.today = parsed.today || 0;
+                }
+            }
+            
+            document.getElementById('today-count').textContent = stats.today;
+        }
+        
+        // 根据使用频率显示"常用"标签
+        function updateFavoriteBadge() {
+            const stats = JSON.parse(localStorage.getItem('amc_dept_stats') || '{}');
+            const businessCount = stats.business || 0;
+            const riskCount = stats.risk_compliance || 0;
+            
+            const businessBadge = document.getElementById('badge-business');
+            const riskBadge = document.getElementById('badge-risk');
+            
+            // 如果都没有使用过，默认显示业务部为常用（因为业务部可能是主要使用的）
+            if (businessCount === 0 && riskCount === 0) {
+                businessBadge.style.display = 'block';
+                riskBadge.style.display = 'none';
+                return;
+            }
+            
+            // 比较使用次数，显示使用次数多的为常用
+            if (businessCount > riskCount) {
+                businessBadge.style.display = 'block';
+                riskBadge.style.display = 'none';
+            } else if (riskCount > businessCount) {
+                businessBadge.style.display = 'none';
+                riskBadge.style.display = 'block';
+            } else {
+                // 使用次数相等时，都显示常用
+                businessBadge.style.display = 'block';
+                riskBadge.style.display = 'block';
+            }
+            
+            console.log('[FavoriteBadge] 业务部:', businessCount, '次, 风险合规部:', riskCount, '次');
+        }
+        
+        updateDateTime();
+        updateStats();
+        updateFavoriteBadge();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>

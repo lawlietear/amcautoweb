@@ -1,0 +1,246 @@
+{
+    "dept_name": "风险合规部",
+    "dept_icon": "⚖️",
+    "filename_pattern": "批复_{timestamp}.docx",
+    "templates": {
+        "yicixing": {
+            "name": "一次性业务批复",
+            "path": "word_templates/template_一次性业务批复.docx",
+            "description": "适用于一次性付款业务"
+        },
+        "fenqi": {
+            "name": "分期处置批复",
+            "path": "word_templates/template_分期业务批复.docx",
+            "description": "适用于分期付款业务"
+        },
+        "shougou": {
+            "name": "收购业务批复",
+            "path": "word_templates/template_收购业务批复.docx",
+            "description": "适用于收购业务"
+        },
+        "shougou_ni": {
+            "name": "收购拟处置业务批复",
+            "path": "word_templates/template_收购拟处置业务批复.docx",
+            "description": "适用于收购拟处置业务"
+        }
+    },
+    "default_template": "yicixing",
+    "variables": [
+        {
+            "key": "approval_no",
+            "label": "批复编号",
+            "type": "text",
+            "required": true,
+            "category": "基本信息",
+            "default": "",
+            "description": "格式：〔年份〕序号，如 〔2026〕007"
+        },
+        {
+            "key": "reviewers",
+            "label": "审核人员",
+            "type": "text",
+            "required": false,
+            "category": "基本信息"
+        },
+        {
+            "key": "business_type",
+            "label": "业务分类",
+            "type": "text",
+            "required": true,
+            "category": "基本信息",
+            "default": ""
+        },
+        {
+            "key": "meeting_date",
+            "label": "会议/审批日",
+            "type": "text",
+            "required": true,
+            "category": "会议信息"
+        },
+        {
+            "key": "meeting_seq",
+            "label": "会次",
+            "type": "text",
+            "required": true,
+            "category": "会议信息"
+        },
+        {
+            "key": "project_name",
+            "label": "项目名称",
+            "type": "text",
+            "required": true,
+            "category": "项目信息"
+        },
+        {
+            "key": "report_name",
+            "label": "尽调报告名称",
+            "type": "text",
+            "required": true,
+            "category": "项目信息"
+        },
+        {
+            "key": "department",
+            "label": "部门",
+            "type": "text",
+            "required": true,
+            "category": "项目信息"
+        },
+        {
+            "key": "project_leaders",
+            "label": "项目负责人",
+            "type": "text",
+            "required": true,
+            "category": "项目信息"
+        },
+        {
+            "key": "debtor_name",
+            "label": "债务人名称",
+            "type": "text",
+            "required": true,
+            "category": "债务人信息"
+        },
+        {
+            "key": "debtor_count",
+            "label": "户数",
+            "type": "text",
+            "required": true,
+            "category": "债务人信息",
+            "default": ""
+        },
+        {
+            "key": "base_date",
+            "label": "基准日",
+            "type": "text",
+            "required": true,
+            "category": "业务信息"
+        },
+        {
+            "key": "principal_amount",
+            "label": "债权本金金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "金额信息"
+        },
+        {
+            "key": "interest_amount",
+            "label": "利息金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "金额信息"
+        },
+        {
+            "key": "other_fees_amount",
+            "label": "其他费用金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "金额信息"
+        },
+        {
+            "key": "total_claim_amount",
+            "label": "债权总额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "金额信息"
+        },
+        {
+            "key": "reserve_price",
+            "label": "拟转让价格（元）",
+            "type": "numeric",
+            "format": "thousand",
+            "required": false,
+            "category": "交易信息"
+        },
+        {
+            "key": "fee_bearer",
+            "label": "交易费用承担主体",
+            "type": "text",
+            "required": false,
+            "category": "交易信息"
+        },
+        {
+            "key": "deposit_amount",
+            "label": "保证金金额（元）",
+            "type": "numeric",
+            "format": "thousand",
+            "required": false,
+            "category": "交易信息"
+        },
+        {
+            "key": "remaining_amount",
+            "label": "剩余交易价款金额（元）",
+            "type": "numeric",
+            "format": "thousand",
+            "required": false,
+            "category": "交易信息"
+        },
+        {
+            "key": "final_payment_deadline",
+            "label": "尾款支付期限",
+            "type": "text",
+            "required": false,
+            "category": "交易信息"
+        },
+        {
+            "key": "occupancy_rate",
+            "label": "资金占用费率",
+            "type": "text",
+            "required": false,
+            "category": "交易信息"
+        },
+        {
+            "key": "payment_months",
+            "label": "分期付款月数",
+            "type": "text",
+            "required": false,
+            "category": "交易信息",
+            "description": "分期处置时填写，如：12个月"
+        },
+        {
+            "key": "bank_name",
+            "label": "银行名称",
+            "type": "text",
+            "required": false,
+            "category": "债务人信息",
+            "description": "收购业务模板需要"
+        },
+        {
+            "key": "approval_date",
+            "label": "批复日期",
+            "type": "text",
+            "readonly": true,
+            "category": "业务信息",
+            "auto": "current_date",
+            "description": "自动生成：当前日期"
+        }
+    ],
+    "sample_data": {
+        "approval_no": "〔2026〕018号",
+        "reviewers": "张三、李四",
+        "business_type": "收购业务",
+        "meeting_date": "2026年3月11日",
+        "meeting_seq": "2026年第8期",
+        "project_name": "收购某上市公司控股股东债权项目",
+        "report_name": "关于收购某上市公司控股股东涉及非金不良资产项目的尽调报告",
+        "department": "北京业务部",
+        "project_leaders": "王五、赵六",
+        "debtor_name": "某投资有限公司",
+        "debtor_count": "1",
+        "bank_name": "中国工商银行股份有限公司济南分行",
+        "base_date": "2025年12月31日",
+        "principal_amount": "100,000,000.00",
+        "interest_amount": "5,000,000.00",
+        "other_fees_amount": "500,000.00",
+        "total_claim_amount": "105,500,000.00",
+        "reserve_price": "80,000,000.00",
+        "fee_bearer": "受让方",
+        "deposit_amount": "10,000,000.00",
+        "remaining_amount": "70,000,000.00",
+        "final_payment_deadline": "交割日后10个工作日内",
+        "occupancy_rate": "8",
+        "payment_months": ""
+    }
+}

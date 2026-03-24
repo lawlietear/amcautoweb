@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审计日志 - 山东金融资产智能文书系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/audit.css') }}?v=2.0">
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="deco-bg">
+        <div class="sunburst"></div>
+        <div class="geo-pattern"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/" class="back-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+                返回首页
+            </a>
+            <span class="nav-title">审计日志</span>
+        </div>
+        <div class="nav-right">
+            <a href="/audit_logout" class="logout-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                退出登录
+            </a>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="page-header">
+            <h1><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:10px;"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><rect width="4" height="12" x="7" y="5" rx="1"/><rect width="4" height="8" x="15" y="9" rx="1"/></svg>操作审计日志</h1>
+            <p>查看所有文档生成记录和操作痕迹</p>
+        </div>
+        
+        <!-- Art Deco 统计卡片 -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--deco-gold);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="total-logs">0</span>
+                    <span class="stat-label">总记录数</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--deco-gold-dark);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="today-logs">0</span>
+                    <span class="stat-label">今日记录</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #AF52DE, #BF5AF2);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="unique-users">0</span>
+                    <span class="stat-label">独立IP数</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 筛选区域 -->
+        <div class="input-section">
+            <div class="section-title">🔍 筛选条件</div>
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>日期范围</label>
+                    <select id="dateFilter" onchange="onDateFilterChange()">
+                        <option value="all">全部</option>
+                        <option value="today">今天</option>
+                        <option value="yesterday">昨天</option>
+                        <option value="week">最近7天</option>
+                        <option value="month">最近30天</option>
+                        <option value="custom">自定义区间</option>
+                    </select>
+                </div>
+                <div class="filter-item custom-date-range" id="customDateRange" style="display:none;">
+                    <label>开始日期</label>
+                    <input type="date" id="startDate" onchange="applyFilters()">
+                </div>
+                <div class="filter-item custom-date-range" id="customDateEnd" style="display:none;">
+                    <label>结束日期</label>
+                    <input type="date" id="endDate" onchange="applyFilters()">
+                </div>
+                <div class="filter-item">
+                    <label>部门</label>
+                    <select id="deptFilter" onchange="applyFilters()">
+                        <option value="all">全部</option>
+                        <option value="风险合规部">风险合规部</option>
+                        <option value="业务部">业务部</option>
+                    </select>
+                </div>
+                <div class="filter-item filter-search">
+                    <label>搜索</label>
+                    <input type="text" id="searchInput" placeholder="文件名、债务人..." oninput="applyFilters()">
+                </div>
+                <button class="btn btn-secondary" onclick="resetFilters()">重置筛选</button>
+            </div>
+        </div>
+        
+        <!-- 日志表格 -->
+        <div class="input-section">
+            <div class="section-header">
+                <div class="section-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/></svg>操作记录</div>
+                <div class="pagination-info" id="paginationInfo">共 0 条</div>
+            </div>
+            <div class="audit-table-container">
+                <table class="audit-table" id="auditTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>IP地址</th>
+                            <th>部门</th>
+                            <th>操作</th>
+                            <th>文件名</th>
+                            <th>摘要</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr class="empty-row">
+                            <td colspan="6">暂无记录</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="pagination" id="pagination">
+                <button class="btn btn-sm" onclick="changePage(-1)" id="prevBtn">上一页</button>
+                <span class="page-info" id="pageInfo">1 / 1</span>
+                <button class="btn btn-sm" onclick="changePage(1)" id="nextBtn">下一页</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allLogs = [];
+        let filteredLogs = [];
+        let currentPage = 1;
+        const pageSize = 20;
+        
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/audit_logs');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allLogs = data.logs;
+                    updateStats();
+                    applyFilters();
+                }
+            } catch (e) {
+                console.error('加载日志失败:', e);
+            }
+        }
+        
+        function updateStats() {
+            const total = allLogs.length;
+            const today = new Date().toDateString();
+            const todayCount = allLogs.filter(log => {
+                const logDate = new Date(log.timestamp).toDateString();
+                return logDate === today;
+            }).length;
+            
+            const uniqueIPs = new Set(allLogs.map(log => log.ip)).size;
+            
+            document.getElementById('total-logs').textContent = total;
+            document.getElementById('today-logs').textContent = todayCount;
+            document.getElementById('unique-users').textContent = uniqueIPs;
+        }
+        
+        function applyFilters() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const deptFilter = document.getElementById('deptFilter').value;
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const startDateVal = document.getElementById('startDate').value;
+            const endDateVal = document.getElementById('endDate').value;
+            
+            filteredLogs = allLogs.filter(log => {
+                if (dateFilter !== 'all') {
+                    const logDate = new Date(log.timestamp);
+                    const today = new Date();
+                    
+                    if (dateFilter === 'custom') {
+                        // 自定义日期区间筛选
+                        if (startDateVal) {
+                            const start = new Date(startDateVal);
+                            start.setHours(0, 0, 0, 0);
+                            if (logDate < start) return false;
+                        }
+                        if (endDateVal) {
+                            const end = new Date(endDateVal);
+                            end.setHours(23, 59, 59, 999);
+                            if (logDate > end) return false;
+                        }
+                    } else {
+                        const diffDays = (today - logDate) / (1000 * 60 * 60 * 24);
+                        
+                        switch(dateFilter) {
+                            case 'today':
+                                if (logDate.toDateString() !== today.toDateString()) return false;
+                                break;
+                            case 'yesterday':
+                                const yesterday = new Date(today);
+                                yesterday.setDate(yesterday.getDate() - 1);
+                                if (logDate.toDateString() !== yesterday.toDateString()) return false;
+                                break;
+                            case 'week':
+                                if (diffDays > 7) return false;
+                                break;
+                            case 'month':
+                                if (diffDays > 30) return false;
+                                break;
+                        }
+                    }
+                }
+                
+                if (deptFilter !== 'all' && log.dept !== deptFilter) {
+                    return false;
+                }
+                
+                if (searchText) {
+                    const searchContent = (log.filename + ' ' + log.summary + ' ' + log.dept).toLowerCase();
+                    if (!searchContent.includes(searchText)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            renderTable();
+        }
+        
+        function onDateFilterChange() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const customStart = document.getElementById('customDateRange');
+            const customEnd = document.getElementById('customDateEnd');
+            
+            if (dateFilter === 'custom') {
+                customStart.style.display = 'block';
+                customEnd.style.display = 'block';
+                // 设置默认日期范围为最近7天
+                const today = new Date();
+                const weekAgo = new Date(today);
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
+            } else {
+                customStart.style.display = 'none';
+                customEnd.style.display = 'none';
+            }
+            applyFilters();
+        }
+        
+        function resetFilters() {
+            document.getElementById('dateFilter').value = 'all';
+            document.getElementById('deptFilter').value = 'all';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('customDateRange').style.display = 'none';
+            document.getElementById('customDateEnd').style.display = 'none';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            applyFilters();
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('auditTableBody');
+            const total = filteredLogs.length;
+            const totalPages = Math.ceil(total / pageSize);
+            
+            document.getElementById('paginationInfo').textContent = `共 ${total} 条`;
+            document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages || 1}`;
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+            
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageLogs = filteredLogs.slice(start, end);
+            
+            if (pageLogs.length === 0) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="6">暂无记录</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = pageLogs.map(log => `
+                <tr>
+                    <td class="timestamp">${formatTimestamp(log.timestamp)}</td>
+                    <td class="ip">${log.ip}</td>
+                    <td class="dept">${log.dept}</td>
+                    <td class="action"><span class="badge badge-success">${log.action}</span></td>
+                    <td class="filename" title="${log.filename}">${log.filename}</td>
+                    <td class="summary">${log.summary}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredLogs.length / pageSize);
+            const newPage = currentPage + delta;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderTable();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        loadLogs();
+    </script>
+</body>
+</html>

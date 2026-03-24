@@ -1,0 +1,241 @@
+/* 审计日志页面样式 - Art Deco 奶油色风格 */
+
+/* 导航栏退出按钮 */
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--deco-gold-dark);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border: 1px solid var(--deco-gold);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.logout-btn:hover {
+    color: white;
+    background: var(--deco-gold);
+}
+
+/* 筛选区域 */
+.filter-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-item label {
+    font-size: 13px;
+    color: var(--deco-gold-dark);
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.filter-item select,
+.filter-item input {
+    padding: 10px 14px;
+    border: 1px solid var(--deco-gold);
+    font-size: 14px;
+    background: white;
+    color: var(--deco-black);
+    min-width: 140px;
+    font-family: inherit;
+}
+
+.filter-item select:focus,
+.filter-item input:focus {
+    outline: none;
+    border-color: var(--deco-gold-dark);
+    box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+}
+
+.filter-search {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-search input {
+    width: 100%;
+}
+
+/* 自定义日期区间样式 */
+.custom-date-range input[type="date"] {
+    min-width: 140px;
+    font-family: inherit;
+    color: var(--deco-black);
+}
+
+.custom-date-range input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: sepia(100%) saturate(300%) brightness(90%) hue-rotate(350deg);
+    cursor: pointer;
+}
+
+/* 审计表格 - Art Deco 风格 */
+.audit-table-container {
+    overflow-x: auto;
+    margin: 0 -20px;
+    padding: 0 20px;
+}
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.audit-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(180deg, var(--deco-gold-dark), var(--deco-gold));
+    border-bottom: 2px solid var(--deco-gold-dark);
+    white-space: nowrap;
+    letter-spacing: 1px;
+}
+
+.audit-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--deco-cream-dark);
+    vertical-align: top;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.audit-table tr:hover td {
+    background: rgba(201, 169, 110, 0.1);
+}
+
+.audit-table .empty-row td {
+    text-align: center;
+    color: var(--deco-gold-dark);
+    padding: 48px;
+    background: transparent;
+}
+
+/* 表格列样式 */
+.audit-table .timestamp {
+    font-family: 'Playfair Display', 'SF Mono', Monaco, monospace;
+    font-size: 13px;
+    color: var(--deco-black);
+    white-space: nowrap;
+}
+
+.audit-table .ip {
+    font-family: 'Playfair Display', 'SF Mono', Monaco, monospace;
+    font-size: 13px;
+    color: var(--deco-gold-dark);
+}
+
+.audit-table .dept {
+    font-weight: 600;
+    color: var(--deco-black);
+}
+
+.audit-table .action {
+    white-space: nowrap;
+}
+
+.audit-table .filename {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--deco-black);
+}
+
+.audit-table .summary {
+    color: var(--deco-gold-dark);
+    font-size: 13px;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 徽章 - Art Deco 风格 */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.badge-success {
+    background: var(--deco-gold);
+    color: white;
+}
+
+/* 分页 - Art Deco 风格 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--deco-gold);
+}
+
+.page-info {
+    font-size: 14px;
+    color: var(--deco-gold-dark);
+    font-weight: 500;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--deco-gold-dark);
+}
+
+/* 统计卡片适配 */
+.stats-cards {
+    margin-bottom: 24px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-item {
+        width: 100%;
+    }
+    
+    .filter-item select,
+    .filter-item input {
+        width: 100%;
+    }
+    
+    .audit-table {
+        font-size: 12px;
+    }
+    
+    .audit-table th,
+    .audit-table td {
+        padding: 10px 12px;
+    }
+    
+    .audit-table .filename,
+    .audit-table .summary {
+        max-width: 120px;
+    }
+}

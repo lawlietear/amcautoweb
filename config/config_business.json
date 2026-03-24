@@ -1,0 +1,321 @@
+{
+    "dept_name": "业务部",
+    "dept_icon": "💼",
+    "filename_pattern": "合同_{contract_no}.docx",
+    "templates": {
+        "yicixing": {
+            "name": "债权转让协议（非分期）",
+            "path": "word_templates/template_债权转让协议_非分期.docx",
+            "description": "适用于一次性付款的债权转让"
+        },
+        "fenqi": {
+            "name": "债权转让协议（分期）",
+            "path": "word_templates/template_债权转让协议_分期处置.docx",
+            "description": "适用于分期付款的债权转让"
+        }
+    },
+    "default_template": "yicixing",
+    "variables": [
+        {
+            "key": "contract_no",
+            "label": "合同编号",
+            "type": "text",
+            "required": true,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_name",
+            "label": "乙方名称（受让方）",
+            "type": "text",
+            "required": true,
+            "category": "合同信息",
+            "description": "填写债务人/受让方名称"
+        },
+        {
+            "key": "base_date",
+            "label": "基准日",
+            "type": "text",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制"
+        },
+        {
+            "key": "principal_amount",
+            "label": "债权本金金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制，自动转大写"
+        },
+        {
+            "key": "interest_amount",
+            "label": "债权利息金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制，自动转大写"
+        },
+        {
+            "key": "other_fees_amount",
+            "label": "其他费用金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制，自动转大写"
+        },
+        {
+            "key": "total_claim_amount",
+            "label": "债权总额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制，自动转大写"
+        },
+        {
+            "key": "deposit_amount",
+            "label": "保证金金额",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制，自动转大写"
+        },
+        {
+            "key": "transfer_price",
+            "label": "转让价格",
+            "type": "numeric",
+            "format": "thousand",
+            "required": true,
+            "category": "批复信息",
+            "description": "可从批复页面复制拟转让价格，自动转大写"
+        },
+        {
+            "key": "remaining_price",
+            "label": "剩余交易价款",
+            "type": "numeric",
+            "format": "thousand",
+            "required": false,
+            "category": "批复信息",
+            "description": "分期时填写，自动转大写"
+        },
+        {
+            "key": "party_a_contact",
+            "label": "甲方联系人",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_a_phone",
+            "label": "甲方联系电话",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_a_fax",
+            "label": "甲方传真",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_a_address",
+            "label": "甲方地址",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_a_zip",
+            "label": "甲方邮编",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_phone",
+            "label": "乙方联系电话",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_fax",
+            "label": "乙方传真",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_address",
+            "label": "乙方地址",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_zip",
+            "label": "乙方邮编",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "bank_name",
+            "label": "收款银行",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "非分期合同需要"
+        },
+        {
+            "key": "interest_rate",
+            "label": "资金占用费率（数字）",
+            "type": "text",
+            "required": false,
+            "category": "批复信息",
+            "description": "只填写数字，如：8 表示8%"
+        },
+        {
+            "key": "funding_start_date",
+            "label": "资金占用起算日",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "分期合同需要"
+        },
+        {
+            "key": "penalty_percent_10_3_2",
+            "label": "违约金比例（10.3.2条款）",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "只填写数字，对应合同10.3.2条款"
+        },
+        {
+            "key": "penalty_percent_10_3_3",
+            "label": "违约金比例（10.3.3条款）",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "只填写数字，对应合同10.3.3条款"
+        },
+        {
+            "key": "party_a_email",
+            "label": "甲方邮箱",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_contact",
+            "label": "乙方联系人",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_email",
+            "label": "乙方邮箱",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "party_b_legal_rep",
+            "label": "乙方法定代表人",
+            "type": "text",
+            "required": false,
+            "category": "合同信息"
+        },
+        {
+            "key": "bank_account_name",
+            "label": "银行账户名称",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "非分期合同需要"
+        },
+        {
+            "key": "bank_account",
+            "label": "银行账号",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "非分期合同需要"
+        },
+        {
+            "key": "yicixing_transition_income",
+            "label": "7.4.1条款-非分期",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "非分期合同填写。1=收入归甲方, 2=收入归乙方"
+        },
+        {
+            "key": "yicixing_disposal_fee",
+            "label": "8.5条款-非分期",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "非分期合同填写。1=甲方承担费用, 2=乙方承担费用"
+        },
+        {
+            "key": "fenqi_transition_income",
+            "label": "7.4.1条款-分期",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "分期合同填写。1=收入归甲方, 2=收入归乙方(交割日前后分别处理), 3=收入归乙方(交割日前冲抵应付款项)"
+        },
+        {
+            "key": "fenqi_disposal_fee",
+            "label": "8.5条款-分期",
+            "type": "text",
+            "required": false,
+            "category": "合同信息",
+            "description": "分期合同填写。1=甲方承担, 2=乙方承担(甲方不垫付), 3=乙方承担(经申请甲方可垫付)"
+        }
+    ],
+    "sample_data": {
+        "contract_no": "鲁金资管债转2026-001号",
+        "party_b_name": "济南某某投资有限公司",
+        "base_date": "2025年12月31日",
+        "principal_amount": "10,000,000.00",
+        "interest_amount": "2,000,000.00",
+        "other_fees_amount": "100,000.00",
+        "total_claim_amount": "12,100,000.00",
+        "deposit_amount": "1,000,000.00",
+        "transfer_price": "8,000,000.00",
+        "remaining_price": "7,000,000.00",
+        "party_a_contact": "张三",
+        "party_a_phone": "0531-12345678",
+        "party_a_fax": "0531-87654321",
+        "party_a_address": "山东省济南市历下区经十路某某号",
+        "party_a_zip": "250000",
+        "party_b_phone": "0531-98765432",
+        "party_b_fax": "0531-23456789",
+        "party_b_address": "山东省济南市高新区舜华路某某号",
+        "party_b_zip": "250101",
+        "bank_name": "中国工商银行济南分行",
+        "interest_rate": "8",
+        "funding_start_date": "2026年3月15日",
+        "penalty_percent_10_3_2": "10",
+        "penalty_percent_10_3_3": "20",
+        "party_a_email": "contact@amc.com",
+        "party_b_contact": "李四",
+        "party_b_email": "lisi@example.com",
+        "party_b_legal_rep": "王五",
+        "bank_account_name": "山东省金融资产管理股份有限公司",
+        "bank_account": "1602003109200123456",
+        "yicixing_transition_income": "2",
+        "yicixing_disposal_fee": "2",
+        "fenqi_transition_income": "3",
+        "fenqi_disposal_fee": "3"
+    }
+}
