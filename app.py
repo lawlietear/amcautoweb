@@ -6,7 +6,7 @@
 
 版本: 2.0.0
 发布日期: 2026-03-12
-作者: Kimi Code CLI
+作者: Kimi Code CLI & Taozheng（Product Owner）
 """
 
 __version__ = "2.0.0"
