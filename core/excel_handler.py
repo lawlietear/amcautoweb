@@ -41,22 +41,28 @@ class ExcelHandler:
     def read(self):
         """
         读取 Excel 文件
+        注意：大文件(>10MB)建议使用 chunksize 参数分批读取
+        当前场景（单次上传<16MB）同步读取可接受
         """
+        import logging
+        logger = logging.getLogger('autodocweb')
+
         try:
             if not os.path.exists(self.excel_path):
-                print(f"❌ Excel 文件不存在：{self.excel_path}")
+                logger.error(f"Excel 文件不存在：{self.excel_path}")
                 return False
-            
+
+            # 对于大文件可考虑: pd.read_excel(self.excel_path, chunksize=1000)
             self.df = pd.read_excel(self.excel_path)
-            
+
             # 如果没有状态列，自动添加
             if '生成状态' not in self.df.columns:
                 self.df['生成状态'] = ""
-                print(f"⚠️ 已自动添加'生成状态'列")
-            
+                logger.warning(f"已自动添加'生成状态'列")
+
             return True
         except Exception as e:
-            print(f"❌ 读取 Excel 失败：{e}")
+            logger.error(f"读取 Excel 失败：{e}")
             return False
     
     def validate_structure(self):
@@ -104,20 +110,75 @@ class ExcelHandler:
     
     def update_status(self, project_no, new_status="已生成"):
         """
-        更新指定项目的生成状态
+        更新指定项目的生成状态 - 使用 openpyxl 增量更新避免全量读写
+        失败时回退到全量读写模式
         """
+        import logging
+        logger = logging.getLogger('autodocweb')
+
+        # 先尝试增量更新
+        if self._update_status_incremental(project_no, new_status):
+            return True
+
+        # 失败时回退到全量模式
+        logger.warning("增量更新失败，回退到全量读写模式")
+        return self._update_status_full(project_no, new_status)
+
+    def _update_status_incremental(self, project_no, new_status):
+        """使用 openpyxl 进行增量更新"""
         try:
-            # 重新读取（避免缓存）
+            from openpyxl import load_workbook
+
+            wb = load_workbook(self.excel_path)
+            ws = wb.active
+
+            # 找到列索引
+            project_col = None
+            status_col = None
+
+            for col_idx, cell in enumerate(ws[1], start=1):
+                if cell.value == '批复编号':
+                    project_col = col_idx
+                elif cell.value == '生成状态':
+                    status_col = col_idx
+
+            if not project_col:
+                return False
+
+            # 查找并更新
+            for row_idx in range(2, ws.max_row + 1):
+                cell_value = ws.cell(row_idx, project_col).value
+                if str(cell_value) == str(project_no):
+                    if status_col:
+                        ws.cell(row_idx, status_col, new_status)
+                    else:
+                        # 没有状态列则添加到最后一列
+                        ws.cell(row_idx, ws.max_column + 1, new_status)
+                        ws.cell(1, ws.max_column, '生成状态')
+                    wb.save(self.excel_path)
+                    return True
+
+            return False
+
+        except Exception:
+            return False
+
+    def _update_status_full(self, project_no, new_status):
+        """全量读写模式（作为 fallback）"""
+        import logging
+        logger = logging.getLogger('autodocweb')
+
+        try:
             df = pd.read_excel(self.excel_path)
-            
+
             mask = df['批复编号'].astype(str) == str(project_no)
             if mask.any():
                 df.loc[mask, '生成状态'] = new_status
                 df.to_excel(self.excel_path, index=False, engine='openpyxl')
                 return True
         except Exception as e:
-            print(f"⚠️ 更新 Excel 状态失败：{e}")
-        
+            logger.warning(f"全量更新 Excel 状态失败：{e}")
+
         return False
     
     def find_by_project_no(self, project_no):

@@ -28,7 +28,7 @@
     "variables": [
         {
             "key": "approval_no",
-            "label": "批复编号",
+            "label": "* 批复编号",
             "type": "text",
             "required": true,
             "category": "基本信息",
@@ -44,7 +44,7 @@
         },
         {
             "key": "business_type",
-            "label": "业务分类",
+            "label": "* 业务分类",
             "type": "text",
             "required": true,
             "category": "基本信息",
@@ -52,56 +52,56 @@
         },
         {
             "key": "meeting_date",
-            "label": "会议/审批日",
+            "label": "* 会议/审批日",
             "type": "text",
             "required": true,
             "category": "会议信息"
         },
         {
             "key": "meeting_seq",
-            "label": "会次",
+            "label": "* 会次",
             "type": "text",
             "required": true,
             "category": "会议信息"
         },
         {
             "key": "project_name",
-            "label": "项目名称",
+            "label": "* 项目名称",
             "type": "text",
             "required": true,
             "category": "项目信息"
         },
         {
             "key": "report_name",
-            "label": "尽调报告名称",
+            "label": "* 尽调报告名称",
             "type": "text",
             "required": true,
             "category": "项目信息"
         },
         {
             "key": "department",
-            "label": "部门",
+            "label": "* 部门",
             "type": "text",
             "required": true,
             "category": "项目信息"
         },
         {
             "key": "project_leaders",
-            "label": "项目负责人",
+            "label": "* 项目负责人",
             "type": "text",
             "required": true,
             "category": "项目信息"
         },
         {
             "key": "debtor_name",
-            "label": "债务人名称",
+            "label": "* 债务人名称",
             "type": "text",
             "required": true,
             "category": "债务人信息"
         },
         {
             "key": "debtor_count",
-            "label": "户数",
+            "label": "* 户数",
             "type": "text",
             "required": true,
             "category": "债务人信息",
@@ -109,14 +109,14 @@
         },
         {
             "key": "base_date",
-            "label": "基准日",
+            "label": "* 基准日",
             "type": "text",
             "required": true,
             "category": "业务信息"
         },
         {
             "key": "principal_amount",
-            "label": "债权本金金额",
+            "label": "* 债权本金金额",
             "type": "numeric",
             "format": "thousand",
             "required": true,
@@ -124,7 +124,7 @@
         },
         {
             "key": "interest_amount",
-            "label": "利息金额",
+            "label": "* 利息金额",
             "type": "numeric",
             "format": "thousand",
             "required": true,
@@ -132,7 +132,7 @@
         },
         {
             "key": "other_fees_amount",
-            "label": "其他费用金额",
+            "label": "* 其他费用金额",
             "type": "numeric",
             "format": "thousand",
             "required": true,
@@ -140,7 +140,7 @@
         },
         {
             "key": "total_claim_amount",
-            "label": "债权总额",
+            "label": "* 债权总额",
             "type": "numeric",
             "format": "thousand",
             "required": true,
@@ -201,7 +201,7 @@
         },
         {
             "key": "bank_name",
-            "label": "银行名称",
+            "label": "* 银行名称",
             "type": "text",
             "required": false,
             "category": "债务人信息",

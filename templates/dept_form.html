@@ -662,6 +662,94 @@
         
         // 变量定义
         const variables = {{ variables|tojson }};
+
+        const RISK_TEMPLATE_REQUIRED = {
+            'yicixing': {  // 一次性业务批复 - 基础必填字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'reserve_price': true,
+                'deposit_amount': false,
+                'bank_name': false
+            },
+            'fenqi': {  // 分期处置批复 - 基础字段 + 分期特有字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'occupancy_rate': true,      // 分期必填
+                'payment_months': true,      // 分期必填
+                'final_payment_deadline': true,  // 分期必填
+                'reserve_price': true,
+                'deposit_amount': false,
+                'bank_name': false
+            },
+            'shougou': {  // 收购业务批复 - 基础字段 + 收购特有字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'bank_name': true,           // 收购必填
+                'reserve_price': false,       // 收购必填
+                'deposit_amount': false
+            },
+            'shougou_ni': {  // 收购拟处置业务批复 - 基础字段 + 收购拟处置特有字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'bank_name': true,           // 收购必填
+                'deposit_amount': true,      // 收购拟处置必填
+                'reserve_price': false
+            }
+        };
+        
+
         const categories = [...new Set(variables.map(v => v.category || '其他'))];
         
         // 分类颜色映射
@@ -734,6 +822,7 @@
             initStandardTable();
         }
         
+
         // 标准单表格初始化
         function initStandardTable() {
             document.getElementById('singleTableSection').style.display = 'block';
@@ -752,14 +841,18 @@
                 licenseKey: 'non-commercial-and-evaluation',
                 contextMenu: ['cut', 'copy', 'paste'],
                 copyPaste: true,
-                renderer: function(instance, td, row, col, prop, value, cellProperties) {
-                    Handsontable.renderers.TextRenderer.apply(this, arguments);
-                    
-                    const varDef = variables.find(v => v.key === prop);
-                    if (varDef && varDef.required && (!value || value === '')) {
-                        td.style.background = 'rgba(201, 169, 110, 0.15)';
+                cells: function(row, col) {
+                    const cellProperties = {};
+                    const prop = this.instance.colToProp(col);
+                    const v = variables.find(x => x.key === prop);
+                    if (v && v.required) {
+                        const data = this.instance.getData();
+                        const value = data[row] ? data[row][prop] : '';
+                        if (!value || value === '') {
+                            
+                        }
                     }
-                    return td;
+                    return cellProperties;
                 },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
@@ -767,9 +860,28 @@
                         autoSave();
                         detectBusinessType();
                     }
+                    if (source !== 'loadData' && changes) {
+                        changes.forEach(function(change) {
+                            const row = change[0];
+                            const prop = change[1];
+                            const newValue = change[3];
+                            const col = hot.propToCol(prop);
+                            const cell = hot.getCell(row, col);
+                            if (cell) {
+                                const v = variables.find(x => x.key === prop);
+                                if (v && v.required) {
+                                    if (!newValue || newValue === '') {
+                                        
+                                    } else {
+                                        
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
             });
-            
+
             // 自动填充带有 auto: "current_date" 标记的字段
             fillAutoDateFields();
         }
@@ -797,7 +909,7 @@
         function initBusinessDualTables() {
             document.getElementById('singleTableSection').style.display = 'none';
             document.getElementById('businessDualTableSection').style.display = 'block';
-            
+
             const pifuColumns = PIFU_KEYS.map(key => {
                 const v = variables.find(x => x.key === key);
                 return {
@@ -807,7 +919,7 @@
                     width: ['principal_amount', 'interest_amount', 'total_claim_amount', 'deposit_amount', 'transfer_price', 'remaining_price'].includes(key) ? 140 : 120
                 };
             });
-            
+
             const hetongColumns = HETONG_KEYS.map(key => {
                 const v = variables.find(x => x.key === key);
                 return {
@@ -835,6 +947,19 @@
                 afterRemoveRow: function(index, amount) {
                     syncRowCount('pifu');
                 },
+                cells: function(row, col) {
+                    const cellProperties = {};
+                    const prop = this.instance.colToProp(col);
+                    const v = variables.find(x => x.key === prop);
+                    if (v && v.required) {
+                        const data = this.instance.getData();
+                        const value = data[row] ? data[row][prop] : '';
+                        if (!value || value === '') {
+                            
+                        }
+                    }
+                    return cellProperties;
+                },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
                         updateStats();
@@ -842,7 +967,7 @@
                     }
                 }
             });
-            
+
             hotHetong = new Handsontable(document.getElementById('hot-container-hetong'), {
                 data: [],
                 columns: hetongColumns,
@@ -865,6 +990,10 @@
                         updateStats();
                         autoSave();
                     }
+                    
+                },
+                afterRender: function() {
+                    
                 }
             });
             
@@ -891,6 +1020,19 @@
                 licenseKey: 'non-commercial-and-evaluation',
                 contextMenu: ['cut', 'copy', 'paste'],
                 copyPaste: true,
+                cells: function(row, col) {
+                    const cellProperties = {};
+                    const prop = this.instance.colToProp(col);
+                    const v = variables.find(x => x.key === prop);
+                    if (v && v.required) {
+                        const data = this.instance.getData();
+                        const value = data[row] ? data[row][prop] : '';
+                        if (!value || value === '') {
+                            
+                        }
+                    }
+                    return cellProperties;
+                },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
                         updateStats();
@@ -1016,6 +1158,11 @@
         }
         
         function updateStats() {
+            console.log('[DEBUG] updateStats called');
+            console.log('[DEBUG] deptKey:', deptKey);
+            console.log('[DEBUG] hot exists:', !!hot);
+            console.log('[DEBUG] variables count:', variables.length);
+            console.log('[DEBUG] allColumns count:', allColumns.length);
             const data = collectData();
             
             // 获取当前模板类型（业务部）
@@ -1063,7 +1210,32 @@
             // 统计必填字段
             let filledRequired = 0;
             let emptyRequired = 0;
-            const requiredVariables = variables.filter(v => v.required && shouldCountField(v.key));
+
+            // 获取当前模板配置（风险合规部动态必填）
+            let dynamicRequiredConfig = null;
+            if (deptKey === 'risk_compliance' && typeof RISK_TEMPLATE_REQUIRED !== 'undefined') {
+                const templateSelect = document.getElementById('templateSelect');
+                if (templateSelect) {
+                    dynamicRequiredConfig = RISK_TEMPLATE_REQUIRED[templateSelect.value];
+                }
+            }
+
+            // 判断字段是否必填
+            function isFieldRequired(v) {
+                // 风险合规部使用动态配置
+                if (deptKey === 'risk_compliance' && typeof RISK_TEMPLATE_REQUIRED !== 'undefined' && dynamicRequiredConfig) {
+                    // 如果字段在动态配置中，使用配置值
+                    if (dynamicRequiredConfig.hasOwnProperty(v.key)) {
+                        return dynamicRequiredConfig[v.key];
+                    }
+                    // 不在配置中的字段，默认非必填
+                    return false;
+                }
+                // 其他部门使用 variables 中的 required 属性
+                return v.required;
+            }
+
+            const requiredVariables = variables.filter(v => isFieldRequired(v) && shouldCountField(v.key));
             requiredVariables.forEach(v => {
                 if (data[v.key] && data[v.key].toString().trim() !== '') {
                     filledRequired++;
@@ -1374,15 +1546,14 @@
             
             variables.forEach(v => {
                 let isRequired = v.required;
-                
+
                 // 风险合规部动态必填判断
                 if (deptKey === 'risk_compliance' && currentTemplate && RISK_TEMPLATE_REQUIRED[currentTemplate]) {
                     const dynamicConfig = RISK_TEMPLATE_REQUIRED[currentTemplate];
-                    if (dynamicConfig.hasOwnProperty(v.key)) {
-                        isRequired = dynamicConfig[v.key];
-                    }
+                    // 如果字段在动态配置中，使用配置值；否则默认非必填
+                    isRequired = dynamicConfig.hasOwnProperty(v.key) ? dynamicConfig[v.key] : false;
                 }
-                
+
                 if (isRequired && (!data[v.key] || data[v.key].toString().trim() === '')) {
                     errors.push(v);
                 }
@@ -1638,17 +1809,6 @@
         }
         
         // 风险合规部动态必填字段配置
-        const RISK_TEMPLATE_REQUIRED = {
-            'shougou': {  // 收购业务
-                'reserve_price': true,   // 拟转让价格必填
-                'deposit_amount': false  // 保证金非必填
-            },
-            'shougou_ni': {  // 收购拟处置业务
-                'reserve_price': false,  // 拟转让价格非必填
-                'deposit_amount': true   // 保证金必填
-            }
-        };
-        
         function onTemplateChange() {
             const select = document.getElementById('templateSelect');
             const info = document.getElementById('templateInfo');
@@ -1657,7 +1817,7 @@
             }
             // 更新条款选择显示
             updateClauseSelection();
-            
+
             // 更新动态必填字段的视觉提示
             updateDynamicRequiredFields();
         }
@@ -1665,24 +1825,44 @@
         // 更新动态必填字段的视觉提示
         function updateDynamicRequiredFields() {
             if (deptKey !== 'risk_compliance') return;
+            if (typeof RISK_TEMPLATE_REQUIRED === 'undefined') return;
             
             const templateSelect = document.getElementById('templateSelect');
             if (!templateSelect) return;
             
             const templateKey = templateSelect.value;
             const config = RISK_TEMPLATE_REQUIRED[templateKey];
+
+            if (!config) return;  // 没有配置，不处理
             
-            if (!config) return;  // 非收购类模板，不处理
-            
-            // 更新字段的视觉提示（如红色星号）
+            // 更新字段的视觉提示（如星号标记）
             Object.keys(config).forEach(fieldKey => {
                 const isRequired = config[fieldKey];
                 const varDef = variables.find(v => v.key === fieldKey);
                 if (varDef) {
                     // 更新变量定义的 required 属性（用于验证）
                     varDef.required = isRequired;
+                    // 更新 label 的星号标记
+                    if (isRequired && !varDef.label.startsWith('* ')) {
+                        varDef.label = '* ' + varDef.label;
+                    } else if (!isRequired && varDef.label.startsWith('* ')) {
+                        varDef.label = varDef.label.substring(2);
+                    }
                 }
             });
+            
+            // 刷新表格以显示新的 label
+            if (hot) {
+                // 更新列定义以反映新的 label
+                const newColumns = allColumns.map(col => {
+                    const varDef = variables.find(v => v.key === col.data);
+                    if (varDef) {
+                        return {...col, title: varDef.label};
+                    }
+                    return col;
+                });
+                hot.updateSettings({columns: newColumns});
+            }
             
             updateStats();  // 更新统计，反映新的必填项数量
         }
@@ -1889,21 +2069,22 @@
             localStorage.removeItem('amc_recent');
             localStorage.setItem('amc_recent_version', '2.0');
             console.log('[Init] 已清理最近使用数据（脱敏模式）');
-            
+
             onTemplateChange();
+
+            // 先初始化动态必填字段（风险合规部）
+            if (deptKey === 'risk_compliance') {
+                updateDynamicRequiredFields();
+            }
+
             loadAutoSave();
             loadDefaultValues();
             updateStats();
             updateRecentList();
-            
+
             // 初始化条款选择显示
             if (isBusiness) {
                 updateClauseSelection();
-            }
-            
-            // 初始化风险合规部动态必填字段
-            if (deptKey === 'risk_compliance') {
-                updateDynamicRequiredFields();
             }
             
             setTimeout(() => {
@@ -2043,3 +2224,4 @@
     </script>
 </body>
 </html>
+<!-- TEMPLATE VERSION: 1775268134 -->

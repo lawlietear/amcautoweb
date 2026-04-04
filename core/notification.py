@@ -53,7 +53,8 @@ class Notification:
             )
             return resp.json().get("errcode") == 0
         except Exception as e:
-            print(f"⚠️ 群通知发送失败：{e}")
+            import logging
+            logging.getLogger('autodocweb').warning(f"群通知发送失败：{e}")
             return False
     
     def write_audit_log(self, ip, dept, action, filename, summary):
@@ -68,7 +69,8 @@ class Notification:
                 f.write(log_entry)
             return True
         except Exception as e:
-            print(f"审计日志写入失败: {e}")
+            import logging
+            logging.getLogger('autodocweb').error(f"审计日志写入失败: {e}")
             return False
     
     def log_generation(self, dept, filename, context, client_ip='127.0.0.1'):

@@ -108,43 +108,38 @@ class DocumentGenerator:
     
     def _generate_filename(self, pattern, context):
         """
-        根据模板生成文件名
+        根据模板生成文件名 - 简化版
+        使用 str.format() 替代手动替换
         """
-        # 在方法内部重新导入，避免作用域问题
         from .format_utils import FormatUtils
-        
+        import logging
+        logger = logging.getLogger('autodocweb')
+
         filename = pattern
-        
-        # 如果文件名不包含占位符，直接进行安全清理
-        if '{' not in filename:
-            # 只清理文件系统非法字符，保留中文标点
-            filename = FormatUtils.safe_filename(filename)
-            # 确保有 .docx 后缀
-            if not filename.endswith('.docx'):
-                filename += '.docx'
-            return filename
-        
+
         # 处理特殊占位符 {timestamp}
         if '{timestamp}' in filename:
-            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = filename.replace('{timestamp}', timestamp)
-        
-        # 处理其他占位符
-        for key, value in context.items():
-            placeholder = '{' + key + '}'
-            if placeholder in filename:
-                # 对值进行安全处理，移除可能导致文件名问题的字符
-                safe_value = str(value) if value else ''
-                # 替换文件名中的非法字符
+            filename = filename.replace('{timestamp}', datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+
+        # 清理 context 值，确保文件名安全
+        safe_context = {}
+        for k, v in context.items():
+            if v:
+                safe_value = str(v)
+                # 移除文件名中的非法字符
                 safe_value = safe_value.replace('/', '_').replace('\\', '_').replace(':', '_')
                 safe_value = safe_value.replace('〔', '').replace('〕', '').replace('号', '')
-                filename = filename.replace(placeholder, safe_value)
-        
-        # 清理非法字符
+                safe_context[k] = safe_value
+            else:
+                safe_context[k] = ''
+
+        try:
+            filename = filename.format(**safe_context)
+        except KeyError as e:
+            logger.warning(f"文件名模板缺少变量: {e}")
+        except Exception as e:
+            logger.warning(f"文件名模板渲染失败: {e}")
+
+        # 清理非法字符并确保后缀
         filename = FormatUtils.safe_filename(filename)
-        
-        # 确保有 .docx 后缀
-        if not filename.endswith('.docx'):
-            filename += '.docx'
-        
-        return filename
+        return filename if filename.endswith('.docx') else filename + '.docx'
