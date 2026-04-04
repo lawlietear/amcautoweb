@@ -204,6 +204,7 @@ def dept_page(dept_key):
         variables=dept_config.get('variables', []),
         templates=dept_config.get('templates'),
         default_template=dept_config.get('default_template'),
+        template_required=dept_config.get('template_required', {}),
         sample_data=sample,
         error_msg=None)
 
@@ -664,7 +665,7 @@ if __name__ == '__main__':
     local_ip = get_local_ip()
     
     print("=" * 60)
-    print(f"山东金融资产智能文书系统 v{__version__}")
+    print(f"AMC Doc Generator v{__version__}")
     print("=" * 60)
     print(f"\n访问地址：")
     print(f"  - 本机：http://127.0.0.1:5000")

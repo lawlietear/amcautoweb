@@ -1553,3 +1553,58 @@ body:not(.index-page) {
     transform: scale(0.95);
 }
 
+
+/* ==================== 必填单元格高亮样式 ==================== */
+
+/* 必填单元格 - 未填写（柔和红色背景） */
+.handsontable .htCore td.required-empty {
+    background: rgba(255, 59, 48, 0.08) !important;
+    border-bottom: 2px solid #FF3B30 !important;
+}
+
+/* 必填单元格 - 已填写（绿色边框） */
+.handsontable .htCore td.required-filled {
+    border-bottom: 2px solid #34C759 !important;
+}
+
+/* 必填列标题高亮 */
+.handsontable .htCore th.required-column {
+    color: #D70015 !important;
+    font-weight: 700 !important;
+}
+
+/* 悬停效果 */
+.handsontable .htCore td.required-empty:hover {
+    background: rgba(255, 59, 48, 0.12) !important;
+}
+
+/* ==================== 企业微信按钮样式 ==================== */
+
+
+/* ==================== 企业微信按钮样式 ==================== */
+
+.btn-text.wechat-work-btn {
+    background: linear-gradient(135deg, #07C160, #05A050);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-text.wechat-work-btn:hover {
+    background: linear-gradient(135deg, #06AD56, #048A45);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(7, 193, 96, 0.3);
+}
+
+.btn-text.wechat-work-btn:active {
+    transform: translateY(0);
+}
+
+.btn-text.wechat-work-btn svg {
+    stroke: white;
+}
