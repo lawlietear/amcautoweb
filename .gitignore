@@ -3,6 +3,9 @@ node_modules/
 __pycache__/
 *.pyc
 venv/
+.venv/
+.venv.bak/
+.venv.old/
 .env
 
 # IDE

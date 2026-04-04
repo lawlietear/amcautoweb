@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- FILE_VERSION: 2025-04-04-FIXED -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ dept_name }} - 山东金融资产智能文书系统</title>
@@ -333,8 +334,8 @@
         <!-- 左侧主内容区 -->
         <div class="main-content">
             <div class="page-header">
-                <h1>{{ dept_name }}文档生成</h1>
-                <p>在表格中录入数据，确认后生成Word文档</p>
+                <h1>{{ dept_name }}文书生成</h1>
+                <p>在表格中录入数据，支持从Excel复制粘贴，确认后生成Word文档</p>
             </div>
             
             {% if error_msg %}
@@ -435,14 +436,6 @@
                             <button class="btn-icon" onclick="addRow()" title="增加一行">+</button>
                             <button class="btn-icon" onclick="removeRow()" title="删除最后一行">−</button>
                         </div>
-                        <button class="btn-text wechat-work-btn" onclick="openWeChatWorkRisk()" title="打开企业微信智能表格，复制批复信息" id="riskWechatBtn" style="display:none;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                <polyline points="15 3 21 3 21 9"/>
-                                <line x1="10" y1="14" x2="21" y2="3"/>
-                            </svg>
-                            打开企业微信智能表格
-                        </button>
                         <button class="btn-text" onclick="loadSampleData()">加载示例</button>
                         <button class="btn-text danger" onclick="clearData()">清空</button>
                     </div>
@@ -460,19 +453,11 @@
                             <button class="btn-icon" onclick="addRowDual()" title="增加一行">+</button>
                             <button class="btn-icon" onclick="removeRowDual()" title="删除最后一行">−</button>
                         </div>
-                        <button class="btn-text wechat-work-btn" onclick="openWeChatWork()" title="打开企业微信智能表格，复制批复信息">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                <polyline points="15 3 21 3 21 9"/>
-                                <line x1="10" y1="14" x2="21" y2="3"/>
-                            </svg>
-                            打开企业微信智能表格
-                        </button>
                         <button class="btn-text" onclick="loadSampleData()">加载示例</button>
                         <button class="btn-text danger" onclick="clearData()">清空</button>
                     </div>
                 </div>
-
+                
                 <!-- 批复信息区 -->
                 <div class="table-subsection">
                     <div class="subsection-title">
@@ -626,7 +611,7 @@
             <div class="panel-section tips-section">
                 <div class="panel-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>使用提示</div>
                 <div class="tips-list" id="tipsList">
-                    <div class="tip-item">使用 企业微信智能表格 复制粘贴</div>
+                    <div class="tip-item">支持 Excel 直接复制粘贴</div>
                     <div class="tip-item">金额自动格式化千分位</div>
                     <div class="tip-item">必填字段会高亮显示</div>
                     <div class="tip-item dept-specific-tip">批复编号格式：〔年份〕序号</div>
@@ -678,98 +663,6 @@
         
         // 变量定义
         const variables = {{ variables|tojson }};
-
-        // 从后端获取动态必填配置
-        const templateRequired = {{ template_required|tojson }};
-
-        // 保留硬编码配置作为后备（兼容旧配置）
-        const RISK_TEMPLATE_REQUIRED_FALLBACK = {
-            'yicixing': {  // 一次性业务批复 - 基础必填字段
-                'approval_no': true,
-                'business_type': true,
-                'meeting_date': true,
-                'meeting_seq': true,
-                'project_name': true,
-                'report_name': true,
-                'department': true,
-                'project_leaders': true,
-                'debtor_name': true,
-                'debtor_count': true,
-                'base_date': true,
-                'principal_amount': true,
-                'interest_amount': true,
-                'other_fees_amount': true,
-                'total_claim_amount': true,
-                'reserve_price': true,
-                'deposit_amount': false,
-                'bank_name': false
-            },
-            'fenqi': {  // 分期处置批复 - 基础字段 + 分期特有字段
-                'approval_no': true,
-                'business_type': true,
-                'meeting_date': true,
-                'meeting_seq': true,
-                'project_name': true,
-                'report_name': true,
-                'department': true,
-                'project_leaders': true,
-                'debtor_name': true,
-                'debtor_count': true,
-                'base_date': true,
-                'principal_amount': true,
-                'interest_amount': true,
-                'other_fees_amount': true,
-                'total_claim_amount': true,
-                'occupancy_rate': true,      // 分期必填
-                'payment_months': true,      // 分期必填
-                'final_payment_deadline': true,  // 分期必填
-                'reserve_price': true,
-                'deposit_amount': false,
-                'bank_name': false
-            },
-            'shougou': {  // 收购业务批复 - 基础字段 + 收购特有字段
-                'approval_no': true,
-                'business_type': true,
-                'meeting_date': true,
-                'meeting_seq': true,
-                'project_name': true,
-                'report_name': true,
-                'department': true,
-                'project_leaders': true,
-                'debtor_name': true,
-                'debtor_count': true,
-                'base_date': true,
-                'principal_amount': true,
-                'interest_amount': true,
-                'other_fees_amount': true,
-                'total_claim_amount': true,
-                'bank_name': true,           // 收购必填
-                'reserve_price': false,       // 收购必填
-                'deposit_amount': false
-            },
-            'shougou_ni': {  // 收购拟处置业务批复 - 基础字段 + 收购拟处置特有字段
-                'approval_no': true,
-                'business_type': true,
-                'meeting_date': true,
-                'meeting_seq': true,
-                'project_name': true,
-                'report_name': true,
-                'department': true,
-                'project_leaders': true,
-                'debtor_name': true,
-                'debtor_count': true,
-                'base_date': true,
-                'principal_amount': true,
-                'interest_amount': true,
-                'other_fees_amount': true,
-                'total_claim_amount': true,
-                'bank_name': true,           // 收购必填
-                'deposit_amount': true,      // 收购拟处置必填
-                'reserve_price': false
-            }
-        };
-        
-
         const categories = [...new Set(variables.map(v => v.category || '其他'))];
         
         // 分类颜色映射
@@ -861,21 +754,18 @@
                 licenseKey: 'non-commercial-and-evaluation',
                 contextMenu: ['cut', 'copy', 'paste'],
                 copyPaste: true,
-                afterRenderer: function(td, row, col, prop, value, cellProperties) {
+                cells: function(row, col) {
+                    const cellProperties = {};
+                    const prop = this.instance.colToProp(col);
                     const v = variables.find(x => x.key === prop);
-                    if (v) {
-                        const templateSelect = document.getElementById('templateSelect');
-                        const currentTemplate = templateSelect ? templateSelect.value : null;
-                        if (isFieldRequiredForCell(v, currentTemplate)) {
-                            if (!value || value === '') {
-                                td.classList.add('required-empty');
-                                td.classList.remove('required-filled');
-                            } else {
-                                td.classList.add('required-filled');
-                                td.classList.remove('required-empty');
-                            }
+                    if (v && v.required) {
+                        const data = this.instance.getData();
+                        const value = data[row] ? data[row][prop] : '';
+                        if (!value || value === '') {
+                            
                         }
                     }
+                    return cellProperties;
                 },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
@@ -883,7 +773,26 @@
                         autoSave();
                         detectBusinessType();
                     }
-                },
+                    if (source !== 'loadData' && changes) {
+                        changes.forEach(function(change) {
+                            const row = change[0];
+                            const prop = change[1];
+                            const newValue = change[3];
+                            const col = hot.propToCol(prop);
+                            const cell = hot.getCell(row, col);
+                            if (cell) {
+                                const v = variables.find(x => x.key === prop);
+                                if (v && v.required) {
+                                    if (!newValue || newValue === '') {
+                                        
+                                    } else {
+                                        
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
             });
 
             // 自动填充带有 auto: "current_date" 标记的字段
@@ -951,17 +860,18 @@
                 afterRemoveRow: function(index, amount) {
                     syncRowCount('pifu');
                 },
-                afterRenderer: function(td, row, col, prop, value, cellProperties) {
+                cells: function(row, col) {
+                    const cellProperties = {};
+                    const prop = this.instance.colToProp(col);
                     const v = variables.find(x => x.key === prop);
                     if (v && v.required) {
+                        const data = this.instance.getData();
+                        const value = data[row] ? data[row][prop] : '';
                         if (!value || value === '') {
-                            td.classList.add('required-empty');
-                            td.classList.remove('required-filled');
-                        } else {
-                            td.classList.add('required-filled');
-                            td.classList.remove('required-empty');
+                            
                         }
                     }
+                    return cellProperties;
                 },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
@@ -988,23 +898,15 @@
                 afterRemoveRow: function(index, amount) {
                     syncRowCount('hetong');
                 },
-                afterRenderer: function(td, row, col, prop, value, cellProperties) {
-                    const v = variables.find(x => x.key === prop);
-                    if (v && v.required) {
-                        if (!value || value === '') {
-                            td.classList.add('required-empty');
-                            td.classList.remove('required-filled');
-                        } else {
-                            td.classList.add('required-filled');
-                            td.classList.remove('required-empty');
-                        }
-                    }
-                },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
                         updateStats();
                         autoSave();
                     }
+                    
+                },
+                afterRender: function() {
+                    
                 }
             });
             
@@ -1031,17 +933,18 @@
                 licenseKey: 'non-commercial-and-evaluation',
                 contextMenu: ['cut', 'copy', 'paste'],
                 copyPaste: true,
-                afterRenderer: function(td, row, col, prop, value, cellProperties) {
+                cells: function(row, col) {
+                    const cellProperties = {};
+                    const prop = this.instance.colToProp(col);
                     const v = variables.find(x => x.key === prop);
                     if (v && v.required) {
+                        const data = this.instance.getData();
+                        const value = data[row] ? data[row][prop] : '';
                         if (!value || value === '') {
-                            td.classList.add('required-empty');
-                            td.classList.remove('required-filled');
-                        } else {
-                            td.classList.add('required-filled');
-                            td.classList.remove('required-empty');
+                            
                         }
                     }
+                    return cellProperties;
                 },
                 afterChange: function(changes, source) {
                     if (source !== 'loadData') {
@@ -1051,7 +954,7 @@
                 }
             });
         }
-
+        
         // 同步两个表格的行数
         function syncRowCount(source) {
             if (!hotPifu || !hotHetong) return;
@@ -1166,34 +1069,8 @@
                 console.error('[updateRowCountDisplay] Error:', e);
             }
         }
-
-        // 获取当前模板类型（全局辅助函数）
-        function getCurrentTemplate() {
-            const templateSelect = document.getElementById('templateSelect');
-            return templateSelect ? templateSelect.value : null;
-        }
-
-        // 判断字段是否必填（用于 cells 和 afterChange，全局辅助函数）
-        function isFieldRequiredForCell(v, templateKey) {
-            if (deptKey === 'risk_compliance' && templateKey) {
-                const configSource = (templateRequired && templateRequired[templateKey])
-                    ? templateRequired
-                    : RISK_TEMPLATE_REQUIRED_FALLBACK;
-                const config = configSource[templateKey];
-                if (config && config.hasOwnProperty(v.key)) {
-                    return config[v.key];
-                }
-                return false;
-            }
-            return v.required;
-        }
-
+        
         function updateStats() {
-            console.log('[DEBUG] updateStats called');
-            console.log('[DEBUG] deptKey:', deptKey);
-            console.log('[DEBUG] hot exists:', !!hot);
-            console.log('[DEBUG] variables count:', variables.length);
-            console.log('[DEBUG] allColumns count:', allColumns.length);
             const data = collectData();
             
             // 获取当前模板类型（业务部）
@@ -1244,25 +1121,18 @@
 
             // 获取当前模板配置（风险合规部动态必填）
             let dynamicRequiredConfig = null;
-            const currentTemplate = getCurrentTemplate();
-            if (deptKey === 'risk_compliance' && currentTemplate) {
-                // 优先使用后端传递的配置，其次使用后备配置
-                const configSource = (templateRequired && templateRequired[currentTemplate])
-                    ? templateRequired
-                    : RISK_TEMPLATE_REQUIRED_FALLBACK;
-                dynamicRequiredConfig = configSource[currentTemplate];
+            if (deptKey === 'risk_compliance') {
+                const templateSelect = document.getElementById('templateSelect');
+                if (templateSelect) {
+                    dynamicRequiredConfig = RISK_TEMPLATE_REQUIRED[templateSelect.value];
+                }
             }
 
             // 判断字段是否必填
             function isFieldRequired(v) {
                 // 风险合规部使用动态配置
-                if (deptKey === 'risk_compliance' && dynamicRequiredConfig) {
-                    // 如果字段在动态配置中，使用配置值
-                    if (dynamicRequiredConfig.hasOwnProperty(v.key)) {
-                        return dynamicRequiredConfig[v.key];
-                    }
-                    // 不在配置中的字段，默认非必填
-                    return false;
+                if (deptKey === 'risk_compliance' && dynamicRequiredConfig && dynamicRequiredConfig.hasOwnProperty(v.key)) {
+                    return dynamicRequiredConfig[v.key];
                 }
                 // 其他部门使用 variables 中的 required 属性
                 return v.required;
@@ -1579,20 +1449,15 @@
             
             variables.forEach(v => {
                 let isRequired = v.required;
-
+                
                 // 风险合规部动态必填判断
-                if (deptKey === 'risk_compliance' && currentTemplate) {
-                    // 优先使用后端传递的配置，其次使用后备配置
-                    const configSource = (templateRequired && templateRequired[currentTemplate])
-                        ? templateRequired
-                        : RISK_TEMPLATE_REQUIRED_FALLBACK;
-                    const dynamicConfig = configSource[currentTemplate];
-                    if (dynamicConfig) {
-                        // 如果字段在动态配置中，使用配置值；否则默认非必填
-                        isRequired = dynamicConfig.hasOwnProperty(v.key) ? dynamicConfig[v.key] : false;
+                if (deptKey === 'risk_compliance' && currentTemplate && RISK_TEMPLATE_REQUIRED[currentTemplate]) {
+                    const dynamicConfig = RISK_TEMPLATE_REQUIRED[currentTemplate];
+                    if (dynamicConfig.hasOwnProperty(v.key)) {
+                        isRequired = dynamicConfig[v.key];
                     }
                 }
-
+                
                 if (isRequired && (!data[v.key] || data[v.key].toString().trim() === '')) {
                     errors.push(v);
                 }
@@ -1787,20 +1652,6 @@
             }, 3000);
         }
         
-        // 打开企业微信智能表格（业务部）
-        function openWeChatWork() {
-            const wechatWorkUrl = 'https://doc.weixin.qq.com/smartsheet/s3_AR8AOAZeAMgCNUVOkjOklTHW2JJrD?scode=ACYANwdZAFAg9PZAHL';
-            window.open(wechatWorkUrl, '_blank');
-            showToast('📋 已打开企业微信智能表格，请复制批复信息后返回粘贴', false);
-        }
-
-        // 打开企业微信智能表格（风险合规部）
-        function openWeChatWorkRisk() {
-            const wechatWorkUrl = 'https://doc.weixin.qq.com/smartsheet/s3_AR8AOAZeAMgCNKpEHKoDWRtOU8QXM?scode=ACYANwdZAFA0Glf8S1AR8AOAZeAMg&tab=q979lj&viewId=vGvWoq';
-            window.open(wechatWorkUrl, '_blank');
-            showToast('📋 已打开企业微信智能表格，请复制批复信息后返回粘贴', false);
-        }
-
         function loadSampleData() {
             {% if sample_data %}
             const sample = {{ sample_data|tojson }};
@@ -1825,9 +1676,15 @@
                 });
             } else if (hot) {
                 Object.keys(sample).forEach(key => {
-                    const colIdx = hot.propToCol(key);
+                    const colIdx = allColumns.findIndex(c => c.data === key);
                     if (colIdx >= 0) {
-                        hot.setDataAtCell(0, colIdx, sample[key]);
+                        for (let rowIdx = 0; rowIdx < hot.countRows(); rowIdx++) {
+                            const rowData = hot.getDataAtRow(rowIdx);
+                            if (rowData && !rowData.__category && rowData.hasOwnProperty(key)) {
+                                hot.setDataAtCell(rowIdx, colIdx, sample[key]);
+                                break;
+                            }
+                        }
                     }
                 });
             }
@@ -1856,6 +1713,92 @@
         }
         
         // 风险合规部动态必填字段配置
+        const RISK_TEMPLATE_REQUIRED = {
+            'yicixing': {  // 一次性业务批复 - 基础必填字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'reserve_price': true,
+                'deposit_amount': false,
+                'bank_name': false
+            },
+            'fenqi': {  // 分期处置批复 - 基础字段 + 分期特有字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'occupancy_rate': true,      // 分期必填
+                'payment_months': true,      // 分期必填
+                'final_payment_deadline': true,  // 分期必填
+                'reserve_price': true,
+                'deposit_amount': false,
+                'bank_name': false
+            },
+            'shougou': {  // 收购业务批复 - 基础字段 + 收购特有字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'bank_name': true,           // 收购必填
+                'reserve_price': false,       // 收购必填
+                'deposit_amount': false
+            },
+            'shougou_ni': {  // 收购拟处置业务批复 - 基础字段 + 收购拟处置特有字段
+                'approval_no': true,
+                'business_type': true,
+                'meeting_date': true,
+                'meeting_seq': true,
+                'project_name': true,
+                'report_name': true,
+                'department': true,
+                'project_leaders': true,
+                'debtor_name': true,
+                'debtor_count': true,
+                'base_date': true,
+                'principal_amount': true,
+                'interest_amount': true,
+                'other_fees_amount': true,
+                'total_claim_amount': true,
+                'bank_name': true,           // 收购必填
+                'deposit_amount': true,      // 收购拟处置必填
+                'reserve_price': false
+            }
+        };
+        
         function onTemplateChange() {
             const select = document.getElementById('templateSelect');
             const info = document.getElementById('templateInfo');
@@ -1872,17 +1815,12 @@
         // 更新动态必填字段的视觉提示
         function updateDynamicRequiredFields() {
             if (deptKey !== 'risk_compliance') return;
-
+            
             const templateSelect = document.getElementById('templateSelect');
             if (!templateSelect) return;
-
+            
             const templateKey = templateSelect.value;
-
-            // 优先使用后端传递的配置，其次使用后备配置
-            const configSource = (templateRequired && templateRequired[templateKey])
-                ? templateRequired
-                : RISK_TEMPLATE_REQUIRED_FALLBACK;
-            const config = configSource[templateKey];
+            const config = RISK_TEMPLATE_REQUIRED[templateKey];
 
             if (!config) return;  // 没有配置，不处理
             
@@ -2122,32 +2060,25 @@
             console.log('[Init] 已清理最近使用数据（脱敏模式）');
 
             onTemplateChange();
-
-            // 先初始化动态必填字段（风险合规部）
-            if (deptKey === 'risk_compliance') {
-                updateDynamicRequiredFields();
-            }
-
             loadAutoSave();
             loadDefaultValues();
             updateStats();
             updateRecentList();
-
+            
             // 初始化条款选择显示
             if (isBusiness) {
                 updateClauseSelection();
+            }
+            
+            // 初始化风险合规部动态必填字段
+            if (deptKey === 'risk_compliance') {
+                updateDynamicRequiredFields();
             }
             
             setTimeout(() => {
                 updateRowCountDisplay();
             }, 500);
             
-            if (deptKey === 'risk_compliance') {
-                // 显示风险合规部的企业微信按钮
-                const riskWechatBtn = document.getElementById('riskWechatBtn');
-                if (riskWechatBtn) riskWechatBtn.style.display = 'inline-flex';
-            }
-
             if (deptKey === 'business') {
                 const tipsList = document.getElementById('tipsList');
                 if (tipsList) {
@@ -2281,4 +2212,4 @@
     </script>
 </body>
 </html>
-<!-- TEMPLATE VERSION: 1775268139 -->
+<!-- TEMPLATE VERSION: 1775268133 -->

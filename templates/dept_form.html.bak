@@ -1825,9 +1825,15 @@
                 });
             } else if (hot) {
                 Object.keys(sample).forEach(key => {
-                    const colIdx = hot.propToCol(key);
+                    const colIdx = allColumns.findIndex(c => c.data === key);
                     if (colIdx >= 0) {
-                        hot.setDataAtCell(0, colIdx, sample[key]);
+                        for (let rowIdx = 0; rowIdx < hot.countRows(); rowIdx++) {
+                            const rowData = hot.getDataAtRow(rowIdx);
+                            if (rowData && !rowData.__category && rowData.hasOwnProperty(key)) {
+                                hot.setDataAtCell(rowIdx, colIdx, sample[key]);
+                                break;
+                            }
+                        }
                     }
                 });
             }

@@ -1,96 +1,68 @@
 # 山东金融资产智能文书系统
 
-> AMC 文书生成器 Web 版 v2.1.0
-
-基于 Flask + Handsontable 的智能文书生成系统，支持风险合规部批复文档和业务部合同文档的批量生成。
+**3秒生成专业合同｜智能填充零出错｜团队协作更高效**
 
 ---
 
-## 功能特性
+## 核心亮点
 
-- **双部门支持**：风险合规部（批复）+ 业务部（合同）
-- **智能模板**：自动识别分期/一次性业务类型
-- **双表格设计**：批复信息与合同信息同步录入
-- **批量生成**：支持 Excel 导入、多行数据批量生成
-- **金额自动化**：千分位格式化 + 中文大写自动转换
-- **审计日志**：完整的操作记录与密码保护
-- **并发支持**：Waitress 生产服务器，支持多人同时访问
+| 功能 | 效果 |
+|------|------|
+| **一键生成** | 填写数据 → 点击生成 → 合同即按照模板生成可用 |
+| **智能记忆** | 数条常用合同信息一键保存，支持下次打开直接填充复用 |
+| **智能表格互通** | 企业微信智能表格批复要素数据复制粘贴无缝对接 |
+| **金额自动转大写** | 输入数字，自动生成合同中文大写金额，零失误 |
+| **多用户并发** | 支持10+人同时使用，不卡顿不冲突 |
 
 ---
 
-## 快速开始
-
-### 安装依赖
+## 快速启动
 
 ```bash
-pip install flask docxtpl pandas openpyxl waitress
-```
-
-### 启动服务
-
-```bash
+# 一键启动（开发模式）
 python app.py
+
+# 或生产模式（支持多人）
+python -m waitress --port=5000 app:app
 ```
 
 访问 http://127.0.0.1:5000
 
 ---
 
-## 使用文档
+## 部门直达
 
-| 文档 | 说明 | 目标读者 |
-|------|------|---------|
-| [📘 用户手册](docs/用户手册.md) | 详细操作指南 | 最终用户 |
-| [📗 部署指南](docs/部署指南.md) | 环境配置、安装步骤 | 系统管理员 |
-| [📙 开发文档](docs/开发文档.md) | 架构、数据结构、实现细节 | 开发者 |
-| [📕 CHANGELOG](CHANGELOG.md) | 版本变更历史 | 所有用户 |
-| [📊 Progress](progress.md) | 开发进展记录 | 开发者 |
+| 部门 | 功能 | 直达链接 |
+|------|------|----------|
+| **风险合规部** | 生成批复文档 | `/risk_compliance` |
+| **业务部** | 生成债权转让合同 | `/business` |
+| **审计日志** | 查看操作记录 | `/audit_log` (密码: amc2026) |
 
 ---
 
-## 项目结构
+## 文档导航
 
-```
-autodocweb_v2/
-├── app.py                 # Flask 主程序
-├── core/                  # 核心模块
-│   ├── config.py         # 统一配置（v2.1新增）
-│   ├── document_generator.py  # 文档生成
-│   ├── format_utils.py   # 格式化工具
-│   ├── excel_handler.py  # Excel处理
-│   └── notification.py   # 通知日志
-├── config/                # 部门配置（JSON）
-├── templates/             # HTML 模板
-├── static/                # 静态资源（CSS、图片）
-├── word_templates/        # Word 模板（.docx）
-├── generated/             # 生成文件输出
-└── docs/                  # 项目文档
-```
+| 文档 | 适合谁 | 内容 |
+|------|--------|------|
+| [业务部快速上手指南](业务部快速上手指南.md) | 业务人员 | 5分钟学会生成合同 |
+| [用户手册](用户手册.md) | 所有用户 | 完整功能说明 |
+| [部署指南](部署指南.md) | IT管理员 | 安装配置教程 |
+| [CHANGELOG](CHANGELOG.md) | 所有用户 | 版本更新记录 |
 
 ---
 
 ## 技术栈
 
-- **后端**: Flask + Waitress
-- **前端**: Handsontable 14.0.0
-- **文档处理**: python-docx / docxtpl
-- **Excel 处理**: pandas / openpyxl
-- **日志**: Python logging + RotatingFileHandler
+- **后端**: Flask + Waitress (生产级并发)
+- **前端**: Handsontable (类Excel操作体验)
+- **文档**: python-docx / docxtpl (Word模板引擎)
+- **数据**: pandas / openpyxl (Excel互通)
 
 ---
 
-## 默认访问信息
+## 项目更名说明
 
-- **首页**: http://localhost:5000
-- **审计日志**: http://localhost:5000/audit_log
-- **审计密码**: `amc2026`
-
----
-
-## 相关文档
-
-- [CHANGELOG](CHANGELOG.md) - 版本变更记录
-- [progress.md](progress.md) - 开发进展记录
-- [docs/用户手册.md](docs/用户手册.md) - 用户操作指南
-- [docs/部署指南.md](docs/部署指南.md) - 系统部署说明
-- [docs/开发文档.md](docs/开发文档.md) - 开发者技术文档
+本项目原名为 `autodocweb_v2`，现已正式更名为 `amc-doc-generator`。
+- 更名时间: 2026-04-02
+- 更名原因: 产品成熟，去掉版本号更专业简洁
+- 功能完全兼容，无破坏性变更
