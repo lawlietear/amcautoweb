@@ -46,15 +46,16 @@ def setup_logging():
     file_handler.setLevel(logging.INFO)
 
     # 控制台日志
+    is_production = os.getenv('PRODUCTION', '0') == '1' or __name__ != '__main__'
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
-    console_handler.setLevel(logging.DEBUG if os.getenv('FLASK_DEBUG') else logging.INFO)
+    console_handler.setLevel(logging.INFO if is_production else logging.DEBUG)
 
     # 根日志配置
     logger = logging.getLogger('autodocweb')
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO if is_production else logging.DEBUG)
 
     return logger
 
@@ -63,22 +64,30 @@ logger = setup_logging()
 
 # ==================== Flask 配置 ====================
 
+is_production = os.getenv('PRODUCTION', '0') == '1'
+
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
-app.config['TEMPLATES_AUTO_RELOAD'] = True  # 禁用模板缓存
 
-# 强制 Jinja2 不缓存模板
-app.jinja_env.auto_reload = True
-app.jinja_env.cache = None
+if not is_production:
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.jinja_env.auto_reload = True
+    app.jinja_env.cache = None
+
 app.secret_key = config.SECRET_KEY
 app.logger.handlers = logger.handlers  # 使用统一日志配置
 
-# 禁用浏览器缓存
 @app.after_request
 def add_header(response):
-    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '-1'
+    if not is_production:
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+    else:
+        if request.path.startswith('/static/'):
+            response.headers['Cache-Control'] = 'public, max-age=3600'
+        elif 'text/html' in (response.content_type or ''):
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
 
 # 从配置模块导入

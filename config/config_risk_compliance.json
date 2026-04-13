@@ -63,7 +63,7 @@
             "other_fees_amount": true,
             "total_claim_amount": true,
             "occupancy_rate": true,
-            "payment_months": true,
+            "payment_months": false,
             "final_payment_deadline": true,
             "reserve_price": true,
             "deposit_amount": false,

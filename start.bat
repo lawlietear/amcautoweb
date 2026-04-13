@@ -59,7 +59,8 @@ echo.
     echo.
     echo 按 CTRL+C 停止服务
     echo ========================================
-    %PYTHON% -m waitress --host=0.0.0.0 --port=5000 app:app
+    set PRODUCTION=1
+    %PYTHON% -m waitress --host=0.0.0.0 --port=5000 --threads=12 app:app
 ) else (
     echo [开发模式] 使用 Flask 启动服务...
     echo [提示] 此模式支持代码热重载，适合开发调试

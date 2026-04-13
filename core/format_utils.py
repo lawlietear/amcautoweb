@@ -17,7 +17,7 @@ class FormatUtils:
         金额转中文大写（完整修复版）
         支持到万亿级别
         """
-        if not amount or amount == '':
+        if amount is None or amount == '':
             return ''
         
         try:
@@ -48,6 +48,9 @@ class FormatUtils:
             else:
                 if jiao > 0:
                     result += num_cn[jiao] + '角'
+                elif integer_part > 0 and fen > 0:
+                    # 有分无角且整数部分非零时补零
+                    result += '零'
                 if fen > 0:
                     result += num_cn[fen] + '分'
             
@@ -77,13 +80,19 @@ class FormatUtils:
         for i, group in enumerate(groups):
             if group > 0:
                 group_str = FormatUtils._four_digit_to_chinese(group, num_cn, units)
-                result = group_str + big_units[i] + result
-        
-        # 清理连续的零
+                if result:
+                    # 判断是否需要补零：低位有空缺分组、低位不足4位，
+                    # 或紧邻的个位组为1000但缺佰拾个位
+                    if (groups[i-1] == 0 or
+                        (0 < groups[i-1] < 1000)):
+                        result = group_str + big_units[i] + '零' + result
+                    else:
+                        result = group_str + big_units[i] + result
+                else:
+                    result = group_str + big_units[i] + result
+
+        # 清理连续零
         result = result.replace('零零', '零')
-        result = result.replace('零万', '万')
-        result = result.replace('零亿', '亿')
-        result = result.replace('亿万', '亿')
         
         return result + '元'
     
