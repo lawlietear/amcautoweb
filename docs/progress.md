@@ -4,6 +4,83 @@ AMC Doc Generator - 山东金融资产智能文书系统
 
 ---
 
+## 2026-04-23 分期条款修复 + 银行默认值 + 6.2.5 条款新增
+
+### 修复分期合同条款变量空白
+**现象**：分期合同生成后，7.4.1 和 8.5 条款变量显示为空白。
+
+**原因**：
+- 后端 `is_fenqi` 使用 `template_name == '分期' or 'fenqi' in path` 判断，但 `template_name` 为完整中文名、路径不含 `fenqi`，导致判断永远失败，后端赋值给非分期变量名。
+- 前端 `collectData()` 中额外判断 `dataset.type === 'fenqi'`，分期模式下即使选了通用选项也不收集。
+
+**修复**：
+- 后端：`is_fenqi = template_key == 'fenqi'`，与前端正交。
+- 前端：移除 `dataset.type` 过滤，直接按 `isFenqi` 决定存入的 key。
+
+**修改文件**：`app.py`、`templates/dept_form.html`
+
+### 银行信息纳入默认值保存
+**现象**：收款银行、银行账户名称、银行账号每次都需要重新填写。
+
+**原因**：这三个字段在 `HETONG_KEYS`（乙方信息，不可保存默认值）中，不在 `DEFAULT_KEYS` / `DEFAULT_VALUE_KEYS` 中。
+
+**修复**：将三个字段从 `HETONG_KEYS` 移出，加入 `DEFAULT_KEYS` 和 `DEFAULT_VALUE_KEYS`，使其进入 localStorage 持久化链路。数据填充/收集/清空逻辑均通过 `propToCol` 动态适配，无需额外调整。
+
+**修改文件**：`templates/dept_form.html`
+
+### 新增 6.2.5 清收回款冲抵安排条款
+**需求**：分期合同 6.2.5 条需要三选一变量替换。
+
+**实现**：
+- 前端：在 7.4.1 条款上方新增 radio 组，三个选项，默认选项 3，带 `fenqi-only` class。
+- 后端：`CLAUSE_CONFIG` 新增 `fenqi_collection_recovery`；`_apply_clause_logic()` 新增仅分期分支处理。
+- 修复 `getClauseSelection()` 和 radio change 监听器遗漏该字段的问题，确保 `collectAllRowsData()` 生成请求时携带。
+
+**修改文件**：`core/config.py`、`app.py`、`templates/dept_form.html`
+
+### Word 模板修复
+**现象**：`template_一次性业务批复.docx` 打开提示"无法读取的内容"。
+
+**原因**：`docProps/app.xml` 中包含 `HeadingPairs`、`TitlesOfParts`、`HyperlinkBase` 三个异常元素，且 `Template` 值为 `AMC_System_Template`。
+
+**修复**：移除三个异常元素，修正 `Template` 为 `Normal.dotm`。
+
+**修改文件**：`word_templates/template_一次性业务批复_fixed.docx`
+
+---
+
+## 2026-04-14 修复已填字段默认计数异常 + 分期违约金列只读
+**现象**：页面初始加载时，业务部显示"已填字段 2"，风险合规部显示"已填字段 1"，但用户并未输入任何内容。
+
+**原因**：
+- 业务部：`setClauseDefaults()` 给 radio 条款按钮设置了默认值，`collectData()` 收集后算入统计。
+- 风险合规部：`fillAutoDateFields()` 自动填充了 `readonly` 的 `approval_date`（当前日期），算入统计。
+
+**修复**：
+- 在 `updateStats()` 的 `shouldCountField()` 中排除所有 `readonly` 字段。
+- 排除系统默认的条款 radio 字段（`yicixing_transition_income`、`yicixing_disposal_fee`、`fenqi_transition_income`、`fenqi_disposal_fee`）。
+- 确保"已填字段"仅统计用户实际可编辑并输入的内容。
+
+**修改文件**：`templates/dept_form.html`
+
+### 分期模板下禁用违约金比例最后两列
+**完成内容**：
+- 新增 `updatePenaltyColumnsReadOnly()`，在分期模板（`fenqi`）下将违约金比例最后两列设为 `readOnly`。
+- 添加深灰色背景 `.read-only-penalty` 作为视觉提示。
+- 在 `onTemplateChange()` 和 `hotDefaults` 初始化后调用该函数。
+- 修复 `detectBusinessType()` 自动识别模板后未触发 `onTemplateChange()` 的遗漏。
+- 将 Handsontable 实例暴露到 `window`，便于调试和自动化测试。
+
+**修改文件**：`templates/dept_form.html`、`app.py`
+
+### 生产环境部署优化
+- 新增 `启动-生产环境.bat`，双击即用 waitress 生产服务器（12 线程）。
+- `app.py` 自动识别 waitress 启动方式并切换为生产配置（关闭模板缓存、启用静态资源缓存）。
+
+**修改文件**：`启动-生产环境.bat`、`start.bat`、`app.py`
+
+---
+
 ## 2026-04-02 代码优化完成 + 项目重命名
 
 ### 重命名记录

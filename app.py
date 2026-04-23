@@ -371,6 +371,14 @@ def _apply_clause_logic(context, is_fenqi):
     context[clause_key] = texts.get(selection, texts[default])
     logger.debug(f"{'分期' if is_fenqi else '非分期'} 8.5条款选择: {selection or default}")
 
+    # 6.2.5 条款 - 过渡期内标的债权清收回款冲抵安排（仅分期）
+    if is_fenqi:
+        selection = str(context.get('fenqi_collection_recovery', '')).strip()
+        texts = CLAUSE_CONFIG['fenqi_collection_recovery']
+        clause_key = 'fenqi_collection_recovery_clause'
+        context[clause_key] = texts.get(selection, texts['3'])
+        logger.debug(f"分期 6.2.5条款选择: {selection or '3'}")
+
     return context
 
 
@@ -428,7 +436,7 @@ def api_generate():
         context = _prepare_context(form_data)
 
         # 步骤3: 应用条款逻辑
-        is_fenqi = template_name == '分期' or 'fenqi' in str(template_path).lower()
+        is_fenqi = template_key == 'fenqi'
         context = _apply_clause_logic(context, is_fenqi)
 
         # 步骤4: 构建文件名

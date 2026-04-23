@@ -532,6 +532,25 @@
                         <span>请仔细核对条款内容，确保与实际交易安排一致后再生成文书</span>
                     </div>
                     
+                    <!-- 6.2.5 条款 - 仅分期 -->
+                    <div class="clause-group">
+                        <div class="clause-label">过渡期内标的债权清收回款冲抵安排：</div>
+                        <div class="radio-group" id="collectionRecoveryGroup">
+                            <label class="radio-item fenqi-only">
+                                <input type="radio" name="collection_recovery" value="1" data-type="fenqi">
+                                <span class="radio-text">清收回款归甲方所有</span>
+                            </label>
+                            <label class="radio-item fenqi-only">
+                                <input type="radio" name="collection_recovery" value="2" data-type="fenqi">
+                                <span class="radio-text">清收回款归乙方所有，但不用于冲抵乙方应付款项</span>
+                            </label>
+                            <label class="radio-item fenqi-only">
+                                <input type="radio" name="collection_recovery" value="3" data-type="fenqi" checked>
+                                <span class="radio-text">清收回款归乙方所有，用于冲抵乙方应付款项</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- 7.4.1 条款 -->
                     <div class="clause-group">
                         <div class="clause-label">过渡期内标的债权收益归属：</div>
@@ -796,15 +815,15 @@
                           'transfer_price', 'remaining_price', 'interest_rate'];
         
         // 合同信息表 - 乙方信息（不可保存为默认值）
-        const HETONG_KEYS = ['party_b_name', 'party_b_legal_rep', 'party_b_address', 
-                            'bank_name', 'bank_account_name', 'bank_account', 
-                            'party_b_phone', 'party_b_fax', 'party_b_zip', 
+        const HETONG_KEYS = ['party_b_name', 'party_b_legal_rep', 'party_b_address',
+                            'party_b_phone', 'party_b_fax', 'party_b_zip',
                             'party_b_contact', 'party_b_email'];
         
         // 甲方信息及违约金比例 - 可保存为默认值
-        const DEFAULT_KEYS = ['contract_no', 'funding_start_date', 
+        const DEFAULT_KEYS = ['contract_no', 'funding_start_date',
                              'party_a_contact', 'party_a_phone', 'party_a_fax',
                              'party_a_address', 'party_a_zip', 'party_a_email',
+                             'bank_name', 'bank_account_name', 'bank_account',
                              'penalty_percent_10_3_2', 'penalty_percent_10_3_3'];
         
         // 准备表格数据
@@ -1219,15 +1238,25 @@
                 }
             }
             
-            // 判断字段是否应该被统计（排除与当前模板类型不相关的条款字段）
+            // 判断字段是否应该被统计（排除与当前模板类型不相关的条款字段、只读字段和系统默认条款）
             function shouldCountField(key) {
+                const v = variables.find(x => x.key === key);
+
+                // 排除只读字段（如自动填充的日期）
+                if (v && v.readonly) return false;
+
+                // 排除条款选择字段（由系统默认设置，不应计入用户填写进度）
+                const clauseKeys = ['yicixing_transition_income', 'yicixing_disposal_fee',
+                                    'fenqi_transition_income', 'fenqi_disposal_fee'];
+                if (clauseKeys.includes(key)) return false;
+
                 // 如果不是业务部，统计所有字段
                 if (!isBusiness) return true;
-                
+
                 // 条款字段前缀
                 const yicixingPrefix = 'yicixing_';
                 const fenqiPrefix = 'fenqi_';
-                
+
                 // 如果是非分期条款字段，但当前是分期模板，不统计
                 if (key.startsWith(yicixingPrefix) && currentTemplateType === 'fenqi') {
                     return false;
@@ -1410,18 +1439,22 @@
                     
                     if (isFenqi) {
                         // 分期合同条款
-                        if (incomeRadio && incomeRadio.dataset.type === 'fenqi') {
+                        if (incomeRadio) {
                             data['fenqi_transition_income'] = incomeRadio.value;
                         }
-                        if (feeRadio && feeRadio.dataset.type === 'fenqi') {
+                        if (feeRadio) {
                             data['fenqi_disposal_fee'] = feeRadio.value;
+                        }
+                        const recoveryRadio = document.querySelector('input[name="collection_recovery"]:checked');
+                        if (recoveryRadio) {
+                            data['fenqi_collection_recovery'] = recoveryRadio.value;
                         }
                     } else {
                         // 非分期合同条款
-                        if (incomeRadio && incomeRadio.dataset.type === 'yicixing') {
+                        if (incomeRadio) {
                             data['yicixing_transition_income'] = incomeRadio.value;
                         }
-                        if (feeRadio && feeRadio.dataset.type === 'yicixing') {
+                        if (feeRadio) {
                             data['yicixing_disposal_fee'] = feeRadio.value;
                         }
                     }
@@ -2005,6 +2038,17 @@
                     radio.checked = (radio.value === '2');
                 }
             });
+
+            // 清收回款冲抵安排默认（仅分期）
+            const recoveryRadios = document.querySelectorAll('input[name="collection_recovery"]');
+            recoveryRadios.forEach(radio => {
+                if (isFenqi) {
+                    // 分期默认选项3
+                    radio.checked = (radio.value === '3');
+                } else {
+                    radio.checked = false;
+                }
+            });
         }
         
         function getClauseSelection() {
@@ -2033,12 +2077,18 @@
                     result['yicixing_disposal_fee'] = feeRadio.value;
                 }
             }
-            
+
+            // 获取清收回款冲抵安排选择（仅分期）
+            const recoveryRadio = document.querySelector('input[name="collection_recovery"]:checked');
+            if (recoveryRadio) {
+                result['fenqi_collection_recovery'] = recoveryRadio.value;
+            }
+
             return result;
         }
         
         // 监听单选按钮变化，自动保存到表格
-        document.querySelectorAll('input[name="transition_income"], input[name="disposal_fee"]').forEach(radio => {
+        document.querySelectorAll('input[name="transition_income"], input[name="disposal_fee"], input[name="collection_recovery"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 syncClauseToTable();
             });
@@ -2219,6 +2269,7 @@
             'contract_no', 'funding_start_date',
             'party_a_contact', 'party_a_phone', 'party_a_fax',
             'party_a_address', 'party_a_zip', 'party_a_email',
+            'bank_name', 'bank_account_name', 'bank_account',
             'penalty_percent_10_3_2', 'penalty_percent_10_3_3'
         ];
         

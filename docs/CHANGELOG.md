@@ -1,5 +1,43 @@
 # Changelog
 
+
+## 2026-04-23
+
+### 修复分期合同条款变量空白
+- 修复后端 `is_fenqi` 判断逻辑：由 `template_name == '分期' or 'fenqi' in path` 改为 `template_key == 'fenqi'`，与前端 `templateSelect.value` 一致
+- 修复前端 `collectData()` 中 radio 收集逻辑：分期模式下不再受 `dataset.type` 限制，确保用户选择任意选项均正确收集到 `fenqi_transition_income` / `fenqi_disposal_fee`
+
+### 银行信息纳入默认值保存
+- 将 `bank_name`、`bank_account_name`、`bank_account` 从 `HETONG_KEYS` 移入 `DEFAULT_KEYS` 和 `DEFAULT_VALUE_KEYS`
+- 收款银行、账户名称、银行账号现可被 `saveDefaultValues()` / `loadDefaultValues()` 持久化到 localStorage
+
+### 新增 6.2.5 清收回款冲抵安排条款
+- 前端：业务部分期模板下新增三选一 radio 组（归甲方 / 归乙方不冲抵 / 归乙方冲抵），默认选项 3
+- 后端：`CLAUSE_CONFIG` 新增 `fenqi_collection_recovery` 配置；`_apply_clause_logic()` 新增 6.2.5 处理逻辑
+- 修复 `getClauseSelection()` 和 radio change 监听器中遗漏 `collection_recovery` 的问题，确保生成请求携带该字段
+
+### Word 模板修复
+- 修复 `template_一次性业务批复.docx` 损坏问题（移除 `docProps/app.xml` 中异常元素，修正 `Template` 值）
+
+
+## 2026-04-14
+
+### 修复已填字段统计虚高
+- 修复 `updateStats()` 中 `shouldCountField()` 函数：
+  - 排除 `readonly` 自动填充字段（如风险合规部的 `approval_date`）
+  - 排除系统默认选中的条款 radio 字段（如业务部的 `transition_income` 和 `disposal_fee`）
+- 确保页面初始加载时"已填字段"计数为 0（用户未手动输入任何内容时）
+
+### 分期模板下禁用违约金比例最后两列
+- 在 `templates/dept_form.html` 新增 `updatePenaltyColumnsReadOnly()` 函数
+- 分期模板（`fenqi`）下，违约金比例最后两列设为 `readOnly` 并显示深灰色背景
+- 修复 `detectBusinessType()` 自动切换模板后未同步更新 UI 的问题
+- 将 Handsontable 实例暴露到 `window`，支持浏览器调试和自动化测试
+
+### 生产环境部署优化
+- 新增 `启动-生产环境.bat`：双击即用 waitress 生产服务器（12 线程）
+- `app.py` 自动识别 waitress 启动方式并切换为生产配置
+
 所有版本的变更记录。
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)

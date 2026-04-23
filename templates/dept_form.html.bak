@@ -305,6 +305,11 @@
         #hot-container-hetong .handsontable .htCore tr:hover td {
             background: rgba(201, 169, 110, 0.08) !important;
         }
+        /* 违约金比例只读列深灰标识 */
+        .htCore td.read-only-penalty {
+            background-color: #6c757d !important;
+            color: #fff !important;
+        }
     </style>
 </head>
 <body>
@@ -1007,7 +1012,7 @@
                     }
                 }
             });
-            
+
             // 初始化甲方信息及违约金比例表格（可保存默认值）
             const defaultsColumns = DEFAULT_KEYS.map(key => {
                 const v = variables.find(x => x.key === key);
@@ -1050,6 +1055,15 @@
                     }
                 }
             });
+
+            // 初始化违约金比例列只读状态
+            updatePenaltyColumnsReadOnly();
+
+            // 暴露表格实例到 window，便于调试和自动化测试
+            window.hot = hot;
+            window.hotPifu = hotPifu;
+            window.hotHetong = hotHetong;
+            window.hotDefaults = hotDefaults;
         }
 
         // 同步两个表格的行数
@@ -1205,15 +1219,25 @@
                 }
             }
             
-            // 判断字段是否应该被统计（排除与当前模板类型不相关的条款字段）
+            // 判断字段是否应该被统计（排除与当前模板类型不相关的条款字段、只读字段和系统默认条款）
             function shouldCountField(key) {
+                const v = variables.find(x => x.key === key);
+
+                // 排除只读字段（如自动填充的日期）
+                if (v && v.readonly) return false;
+
+                // 排除条款选择字段（由系统默认设置，不应计入用户填写进度）
+                const clauseKeys = ['yicixing_transition_income', 'yicixing_disposal_fee',
+                                    'fenqi_transition_income', 'fenqi_disposal_fee'];
+                if (clauseKeys.includes(key)) return false;
+
                 // 如果不是业务部，统计所有字段
                 if (!isBusiness) return true;
-                
+
                 // 条款字段前缀
                 const yicixingPrefix = 'yicixing_';
                 const fenqiPrefix = 'fenqi_';
-                
+
                 // 如果是非分期条款字段，但当前是分期模板，不统计
                 if (key.startsWith(yicixingPrefix) && currentTemplateType === 'fenqi') {
                     return false;
@@ -1396,18 +1420,18 @@
                     
                     if (isFenqi) {
                         // 分期合同条款
-                        if (incomeRadio && incomeRadio.dataset.type === 'fenqi') {
+                        if (incomeRadio) {
                             data['fenqi_transition_income'] = incomeRadio.value;
                         }
-                        if (feeRadio && feeRadio.dataset.type === 'fenqi') {
+                        if (feeRadio) {
                             data['fenqi_disposal_fee'] = feeRadio.value;
                         }
                     } else {
                         // 非分期合同条款
-                        if (incomeRadio && incomeRadio.dataset.type === 'yicixing') {
+                        if (incomeRadio) {
                             data['yicixing_transition_income'] = incomeRadio.value;
                         }
-                        if (feeRadio && feeRadio.dataset.type === 'yicixing') {
+                        if (feeRadio) {
                             data['yicixing_disposal_fee'] = feeRadio.value;
                         }
                     }
@@ -1825,15 +1849,9 @@
                 });
             } else if (hot) {
                 Object.keys(sample).forEach(key => {
-                    const colIdx = allColumns.findIndex(c => c.data === key);
+                    const colIdx = hot.propToCol(key);
                     if (colIdx >= 0) {
-                        for (let rowIdx = 0; rowIdx < hot.countRows(); rowIdx++) {
-                            const rowData = hot.getDataAtRow(rowIdx);
-                            if (rowData && !rowData.__category && rowData.hasOwnProperty(key)) {
-                                hot.setDataAtCell(rowIdx, colIdx, sample[key]);
-                                break;
-                            }
-                        }
+                        hot.setDataAtCell(0, colIdx, sample[key]);
                     }
                 });
             }
@@ -1873,6 +1891,9 @@
 
             // 更新动态必填字段的视觉提示
             updateDynamicRequiredFields();
+
+            // 更新违约金比例列只读状态
+            updatePenaltyColumnsReadOnly();
         }
         
         // 更新动态必填字段的视觉提示
@@ -1946,6 +1967,28 @@
             
             // 设置默认值
             setClauseDefaults(isFenqi);
+        }
+        
+        // 根据模板类型更新违约金比例列的只读状态
+        function updatePenaltyColumnsReadOnly() {
+            if (!hotDefaults) return;
+            const templateSelect = document.getElementById('templateSelect');
+            const isFenqi = templateSelect && templateSelect.value === 'fenqi';
+            const colIndices = [
+                hotDefaults.propToCol('penalty_percent_10_3_2'),
+                hotDefaults.propToCol('penalty_percent_10_3_3')
+            ];
+            colIndices.forEach(colIdx => {
+                if (colIdx >= 0) {
+                    hotDefaults.setCellMeta(0, colIdx, 'readOnly', isFenqi);
+                    if (isFenqi) {
+                        hotDefaults.setCellMeta(0, colIdx, 'className', 'read-only-penalty');
+                    } else {
+                        hotDefaults.removeCellMeta(0, colIdx, 'className');
+                    }
+                }
+            });
+            hotDefaults.render();
         }
         
         function setClauseDefaults(isFenqi) {
@@ -2042,6 +2085,7 @@
                     if (info) {
                         info.innerHTML = '<span style="color: var(--deco-gold-dark);">⚡ 已自动识别为分期处置业务（填写了资金占用费率）</span>';
                     }
+                    onTemplateChange();
                 }
             } else if (data.business_type && (data.business_type.includes('分期') || data.business_type.toLowerCase().includes('fenqi'))) {
                 if (templateSelect.value !== 'fenqi') {
@@ -2049,6 +2093,7 @@
                     if (info) {
                         info.innerHTML = '<span style="color: var(--deco-gold-dark);">⚡ 已自动识别为分期处置业务（业务分类包含"分期"）</span>';
                     }
+                    onTemplateChange();
                 }
             } else {
                 if (templateSelect.value !== 'yicixing') {
@@ -2056,6 +2101,7 @@
                     if (info) {
                         info.textContent = '当前选择：一次性业务批复 - 适用于一次性付款业务';
                     }
+                    onTemplateChange();
                 }
             }
         }
