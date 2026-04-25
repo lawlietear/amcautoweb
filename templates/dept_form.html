@@ -669,8 +669,8 @@
                 <div class="defaults-list">
                     <div class="defaults-item">• 合同编号</div>
                     <div class="defaults-item">• 资金占用费起算日</div>
-                    <div class="defaults-item">• 甲方联系人、电话、传真</div>
-                    <div class="defaults-item">• 甲方地址、邮编、邮箱</div>
+                    <div class="defaults-item">• 甲方联系人、电话、传真、地址、邮编、邮箱</div>
+                    <div class="defaults-item">• 甲方收款银行、银行账户名称、银行账号</div>
                     <div class="defaults-item">• 违约金比例（10.3.2/10.3.3）</div>
                 </div>
             </div>
@@ -1507,8 +1507,8 @@
                         }
                     });
                     
-                    // 添加甲方信息及违约金比例（第一行的值应用到所有行）
-                    if (hotDefaults && rowIdx === 0) {
+                    // 添加甲方信息及违约金比例（hotDefaults 只有一行，应用到所有合同）
+                    if (hotDefaults) {
                         DEFAULT_KEYS.forEach(key => {
                             const colIdx = hotDefaults.propToCol(key);
                             if (colIdx >= 0) {
